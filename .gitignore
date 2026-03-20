@@ -3,4 +3,4 @@ docs/repos
 node_modules/
 .cmux/
 dist/
-
+.claude/hooks
