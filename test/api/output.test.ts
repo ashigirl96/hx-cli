@@ -248,6 +248,15 @@ describe("edge cases", () => {
 		const result = deny()._resolve("PostToolUseFailure")
 		expect(result).toEqual({})
 	})
+
+	test("incompatible helpers on PermissionRequest return empty (no accidental allow)", () => {
+		// These should NOT produce decision: { behavior: "allow" }
+		expect(addContext("ctx")._resolve("PermissionRequest")).toEqual({})
+		expect(ask("why")._resolve("PermissionRequest")).toEqual({})
+		expect(accept({ ok: true })._resolve("PermissionRequest")).toEqual({})
+		expect(new HookOutput()._resolve("PermissionRequest")).toEqual({})
+		expect(modifyInput({ cmd: "x" })._resolve("PermissionRequest")).toEqual({})
+	})
 })
 
 describe("isHookOutput", () => {

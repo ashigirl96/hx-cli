@@ -109,16 +109,21 @@ export class HookOutput {
 						},
 					}
 				}
-				// allow (default for PermissionRequest when decision is "allow" or unset with input)
-				return {
-					hookSpecificOutput: {
-						hookEventName: "PermissionRequest" as const,
-						decision: {
-							behavior: "allow" as const,
-							...(this._updatedInput !== undefined && { updatedInput: this._updatedInput }),
+				if (this._decision === "allow") {
+					return {
+						hookSpecificOutput: {
+							hookEventName: "PermissionRequest" as const,
+							decision: {
+								behavior: "allow" as const,
+								...(this._updatedInput !== undefined && {
+									updatedInput: this._updatedInput,
+								}),
+							},
 						},
-					},
+					}
 				}
+				// No explicit allow/deny — return empty to avoid accidental auto-approval
+				return {}
 			}
 
 			case "Elicitation":
