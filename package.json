@@ -1,0 +1,41 @@
+{
+	"name": "clex",
+	"version": "0.1.0",
+	"description": "Claude Code extension SDK — write hooks with TypeScript, compile to settings.local.json",
+	"license": "MIT",
+	"bin": {
+		"clex": "./src/cli/index.ts"
+	},
+	"files": [
+		"src",
+		"templates"
+	],
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./runtime": "./src/runtime.ts"
+	},
+	"scripts": {
+		"test": "bun test",
+		"check": "oxlint --fix . && oxfmt --write .",
+		"ci:check": "oxlint . && oxfmt --check .",
+		"typecheck": "tsc --noEmit",
+		"prepare": "lefthook install"
+	},
+	"devDependencies": {
+		"@anthropic-ai/claude-agent-sdk": "latest",
+		"@types/bun": "latest",
+		"lefthook": "^2.1.4",
+		"oxfmt": "latest",
+		"oxlint": "latest",
+		"typescript": "^5.7.0"
+	},
+	"peerDependencies": {
+		"@anthropic-ai/claude-agent-sdk": "*"
+	},
+	"peerDependenciesMeta": {
+		"@anthropic-ai/claude-agent-sdk": {
+			"optional": true
+		}
+	}
+}

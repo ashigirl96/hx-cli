@@ -1,0 +1,26 @@
+{
+	"ignorePatterns": ["dist/", ".claude/hooks/", "docs/"],
+	"categories": {
+		"correctness": "error",
+		"pedantic": "error",
+		"perf": "error"
+	},
+	"rules": {
+		"max-lines-per-function": "off",
+		"max-nested-callbacks": "off",
+		"max-depth": "off",
+		"require-await": "off",
+		"no-inline-comments": "off",
+		"no-negated-condition": "off",
+		"no-await-in-loop": "off",
+		"no-warning-comments": "off",
+		"max-classes-per-file": "off",
+		"typescript/no-deprecated": "error"
+	},
+	"overrides": [
+		{
+			"files": ["**/*.ts"],
+			"rules": { "typescript/triple-slash-reference": "off" }
+		}
+	]
+}
