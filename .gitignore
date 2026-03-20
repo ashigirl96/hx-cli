@@ -4,3 +4,4 @@ node_modules/
 .cmux/
 dist/
 .claude/hooks
+docs/memory/

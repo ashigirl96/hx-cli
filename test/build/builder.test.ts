@@ -202,7 +202,9 @@ describe("builder", () => {
 		const settingsPath = path.join(tmpDir, ".claude", "settings.local.json")
 		const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"))
 		const command = settings.hooks.Stop[0].hooks[0].command as string
-		expect(command).toContain('"$CLAUDE_PROJECT_DIR"')
+		expect(command).toMatch(/^node "\$CLAUDE_PROJECT_DIR\/.*"/)
+		// Ensure the entire path is quoted, not just $CLAUDE_PROJECT_DIR
+		expect(command).not.toContain('"$CLAUDE_PROJECT_DIR"/')
 		expect(command).toStartWith("node ")
 	})
 })

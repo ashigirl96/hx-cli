@@ -166,7 +166,7 @@ export async function buildExtensions(
 
 			// Generate settings entry
 			const relDistPath = path.relative(projectRoot, path.join(extDistDir, outName))
-			const command = `${runtime} "$CLAUDE_PROJECT_DIR"/${relDistPath} # clex-managed:${ext.name}:${group.event}:${group.matcher ?? ""}`
+			const command = `${runtime} "$CLAUDE_PROJECT_DIR/${relDistPath}" # clex-managed:${ext.name}:${group.event}:${group.matcher ?? ""}`
 
 			addSettingsEntry(allSettings, group.event, group.matcher, {
 				type: "command",
