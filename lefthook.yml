@@ -1,0 +1,9 @@
+pre-push:
+  parallel: false
+  commands:
+    ci-check:
+      run: bun run ci:check
+    typecheck:
+      run: bun run typecheck
+    test:
+      run: bun run test
