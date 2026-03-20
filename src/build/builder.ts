@@ -8,6 +8,10 @@ import type { HookSettingsEntry, SettingsHooks } from "../types/settings.js"
 import { bundleEntryScript } from "./bundler.js"
 import { artifactName, generateEntryScript } from "./codegen.js"
 import { discoverExtensions } from "./discover.js"
+import { clexResolvePlugin } from "./resolve-plugin.js"
+
+// Register global plugin so dynamic import() of extensions can resolve "clex"
+Bun.plugin(clexResolvePlugin)
 
 // ---------------------------------------------------------------------------
 // Detect runtime (bun or node)
