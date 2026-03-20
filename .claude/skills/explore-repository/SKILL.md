@@ -18,6 +18,7 @@ Investigate a GitHub repository by fetching its source code locally and explorin
 ## Step 1: Identify which repositories need resolving
 
 Read the user's prompt and identify repository references:
+
 - Repositories you need to resolve via `librarian`: any repo name, URL, or owner/repo that is NOT the current working directory
 - Repositories you already have: the current working directory (cwd) — no resolution needed
 

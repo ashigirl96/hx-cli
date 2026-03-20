@@ -2,19 +2,15 @@
  * SessionStart — Inject context when a session starts.
  *
  * source can be "startup" | "resume" | "clear" | "compact".
- * Use matcher to filter by source (e.g. { matcher: "startup" }).
+ * Use matcher to filter by source (e.g. "startup").
  */
-import { defineExtension } from "@dawkinsuke/hooks"
+import { defineExtension, addContext } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
-	cc.on("SessionStart", { matcher: "startup" }, async (_input) => {
+	cc.on("SessionStart", "startup", async () => {
 		const now = new Date().toISOString()
-
-		return {
-			hookSpecificOutput: {
-				hookEventName: "SessionStart" as const,
-				additionalContext: `Session started at ${now}. Project uses pnpm, Biome for lint, Vitest for tests.`,
-			},
-		}
+		return addContext(
+			`Session started at ${now}. Project uses pnpm, Biome for lint, Vitest for tests.`,
+		)
 	})
 })

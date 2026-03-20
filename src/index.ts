@@ -56,5 +56,19 @@ export type {
 
 export type { HookEventMap } from "./types/events.js"
 
+// Output helpers
+export {
+	HookOutput,
+	deny,
+	allow,
+	ask,
+	addContext,
+	modifyInput,
+	accept,
+	decline,
+	cancel,
+	isHookOutput,
+} from "./api/output.js"
+
 // Runtime (for generated hook scripts)
 export { runHook, HookBlockError } from "./runtime.js"

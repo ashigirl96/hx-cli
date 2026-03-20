@@ -73,11 +73,17 @@ export function createCollector(
 
 	const api: HooksAPI = {
 		on(event: HookEvent, ...args: unknown[]): void {
-			// Parse overloaded args: (event, handler) or (event, options, handler)
+			// Parse overloaded args:
+			//   (event, handler)
+			//   (event, options, handler)
+			//   (event, matcher: string, handler)
 			let matcher: string | undefined
 			let timeout: number | undefined
 
-			if (args.length >= 2 && typeof args[0] === "object" && args[0] !== null) {
+			if (args.length >= 2 && typeof args[0] === "string") {
+				// String matcher shorthand: on("PreToolUse", "Bash", handler)
+				matcher = args[0]
+			} else if (args.length >= 2 && typeof args[0] === "object" && args[0] !== null) {
 				const opts = args[0] as OnOptionsWithMatcher | OnOptionsNoMatcher
 				matcher = "matcher" in opts ? opts.matcher : undefined
 				timeout = opts.timeout

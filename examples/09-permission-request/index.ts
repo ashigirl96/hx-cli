@@ -1,41 +1,21 @@
 /**
  * PermissionRequest — Programmatically control permission requests.
  *
- * PermissionRequestHookSpecificOutput.decision:
- *   - { behavior: "allow" } — grant permission
- *   - { behavior: "deny", message?: string } — reject
- *   - updatedInput / updatedPermissions can also be used to rewrite inputs or permissions
+ * `deny()` rejects with an optional message.
+ * `allow()` grants permission, optionally with `.input()` to rewrite.
  */
-import { defineExtension } from "@dawkinsuke/hooks"
+import { defineExtension, allow, deny } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
-	cc.on("PermissionRequest", { matcher: "Bash" }, async (input) => {
-		const toolInput = input.tool_input as Record<string, unknown>
-		const command = toolInput?.command as string | undefined
-
+	cc.on("PermissionRequest", "Bash", async (input) => {
 		// Always deny npm publish
-		if (command?.includes("npm publish")) {
-			return {
-				hookSpecificOutput: {
-					hookEventName: "PermissionRequest" as const,
-					decision: {
-						behavior: "deny" as const,
-						message: "npm publish is not allowed from Claude Code.",
-					},
-				},
-			}
+		if (input.tool_input.command?.includes("npm publish")) {
+			return deny("npm publish is not allowed from Claude Code.")
 		}
 
 		// Auto-allow test commands
-		if (command?.match(/^(bun|npm|pnpm|yarn)\s+test/)) {
-			return {
-				hookSpecificOutput: {
-					hookEventName: "PermissionRequest" as const,
-					decision: {
-						behavior: "allow" as const,
-					},
-				},
-			}
+		if (input.tool_input.command?.match(/^(bun|npm|pnpm|yarn)\s+test/)) {
+			return allow()
 		}
 	})
 })
