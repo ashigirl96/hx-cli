@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * hx CLI — Claude Code hooks SDK.
+ * hx CLI — Claude Code hooks toolkit.
  */
 import { parseArgs } from "node:util"
 import { buildCommand } from "./commands/build.js"
@@ -24,7 +24,7 @@ const { positionals, values } = parseArgs({
 const command = positionals[0]
 
 if (values.help || !command) {
-	console.log(`hx — Claude Code hooks SDK
+	console.log(`hx — Claude Code hooks toolkit
 
 Usage: hx <command> [options]
 

@@ -1,6 +1,6 @@
 # @dawkinsuke/hooks
 
-Claude Code hooks SDK — write hooks in TypeScript, compile to `settings.local.json`.
+Claude Code hooks toolkit — write hooks in TypeScript, compile to `settings.local.json`.
 
 ```
 Write TypeScript extensions → hx build → hooks & settings ready

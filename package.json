@@ -1,7 +1,7 @@
 {
 	"name": "@dawkinsuke/hooks",
 	"version": "0.1.0",
-	"description": "Claude Code hooks SDK — write hooks with TypeScript, compile to settings.local.json",
+	"description": "Claude Code hooks toolkit — write hooks with TypeScript, compile to settings.local.json",
 	"license": "MIT",
 	"bin": {
 		"hx": "./src/cli/index.ts"

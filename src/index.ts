@@ -1,5 +1,5 @@
 /**
- * @dawkinsuke/hooks — Claude Code hooks SDK.
+ * @dawkinsuke/hooks — Claude Code hooks toolkit.
  *
  * Write hooks with TypeScript, compile to settings.local.json.
  */
