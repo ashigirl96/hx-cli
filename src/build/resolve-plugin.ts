@@ -26,7 +26,7 @@ export const clexResolvePlugin: BunPlugin = {
 			if (resolved) {
 				return { path: resolved }
 			}
-			return undefined
+			return
 		})
 	},
 }
