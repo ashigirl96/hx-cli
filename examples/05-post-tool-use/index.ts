@@ -5,7 +5,7 @@
  *   - additionalContext: supplementary info about the tool result
  *   - updatedMCPToolOutput: rewrite the output of an MCP tool
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("PostToolUse", { matcher: "Bash" }, async (input) => {

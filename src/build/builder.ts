@@ -8,7 +8,7 @@ import type { HookSettingsEntry, SettingsHooks } from "../types/settings.js"
 import { bundleEntryScript } from "./bundler.js"
 import { artifactName, generateEntryScript } from "./codegen.js"
 import { discoverExtensions } from "./discover.js"
-import { ensureClexResolvable } from "./resolve-plugin.js"
+import { ensureHxResolvable } from "./resolve-plugin.js"
 
 // ---------------------------------------------------------------------------
 // Detect runtime (bun or node)
@@ -79,7 +79,7 @@ export async function buildExtensions(
 	// 1. Discover extensions
 	const extensions = discoverExtensions(extensionsDir)
 	if (extensions.length === 0) {
-		// Strip any stale clex-managed entries from a previous build
+		// Strip any stale hx-managed entries from a previous build
 		await cleanSettings(projectRoot)
 		return { extensions: [], hookCount: 0, errors: [] }
 	}
@@ -97,8 +97,8 @@ export async function buildExtensions(
 	const allSettings: SettingsHooks = {}
 	let hookCount = 0
 
-	// Ensure "clex" is resolvable from the project (symlink if needed)
-	const cleanupSymlink = ensureClexResolvable(projectRoot)
+	// Ensure "@dawkinsuke/hooks" is resolvable from the project (symlink if needed)
+	const cleanupSymlink = ensureHxResolvable(projectRoot)
 
 	for (const ext of extensions) {
 		if (disabledSet.has(ext.name)) continue
@@ -166,7 +166,7 @@ export async function buildExtensions(
 
 			// Generate settings entry
 			const relDistPath = path.relative(projectRoot, path.join(extDistDir, outName))
-			const command = `${runtime} "$CLAUDE_PROJECT_DIR/${relDistPath}" # clex-managed:${ext.name}:${group.event}:${group.matcher ?? ""}`
+			const command = `${runtime} "$CLAUDE_PROJECT_DIR/${relDistPath}" # hx-managed:${ext.name}:${group.event}:${group.matcher ?? ""}`
 
 			addSettingsEntry(allSettings, group.event, group.matcher, {
 				type: "command",
@@ -180,7 +180,7 @@ export async function buildExtensions(
 		for (const reg of collected.registrations) {
 			if (reg.type === "command") continue
 
-			const hookId = `clex-managed:${ext.name}:${reg.event}:${reg.type}`
+			const hookId = `hx-managed:${ext.name}:${reg.event}:${reg.type}`
 
 			if (reg.type === "http") {
 				addSettingsEntry(allSettings, reg.event, reg.config.matcher, {
@@ -215,7 +215,7 @@ export async function buildExtensions(
 	// 6. Clean up temporary symlink
 	cleanupSymlink()
 
-	// 7. Merge into settings.local.json (always — strips stale clex entries even when empty)
+	// 7. Merge into settings.local.json (always — strips stale hx entries even when empty)
 	await mergeSettings(projectRoot, allSettings)
 
 	// 8. Update manifest

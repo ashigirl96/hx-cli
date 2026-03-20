@@ -4,7 +4,7 @@
  * This is a NoMatcherEvent: matcher is not available (always fires).
  * Useful for adding extra instructions to Claude based on user input.
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("UserPromptSubmit", async (input) => {

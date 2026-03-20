@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "clex",
+      "name": "@dawkinsuke/hooks",
       "devDependencies": {
         "@anthropic-ai/claude-agent-sdk": "latest",
         "@types/bun": "latest",

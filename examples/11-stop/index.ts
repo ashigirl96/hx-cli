@@ -6,7 +6,7 @@
  *   - continue: true cancels the stop and lets Claude keep going
  *   - stopReason: overrides the stop reason
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("Stop", async (_input) => {

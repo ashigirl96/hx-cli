@@ -1,7 +1,7 @@
 import * as fs from "node:fs"
 import * as path from "node:path"
 
-const SAMPLE_EXTENSION = `import { defineExtension } from "clex";
+const SAMPLE_EXTENSION = `import { defineExtension } from "@dawkinsuke/hooks";
 
 export default defineExtension((cc) => {
 \tcc.on("PreToolUse", { matcher: "Bash" }, async (input) => {
@@ -14,7 +14,7 @@ export default defineExtension((cc) => {
 \t\t\t\thookSpecificOutput: {
 \t\t\t\t\thookEventName: "PreToolUse" as const,
 \t\t\t\t\tpermissionDecision: "deny" as const,
-\t\t\t\t\tpermissionDecisionReason: "Destructive command blocked by clex",
+\t\t\t\t\tpermissionDecisionReason: "Destructive command blocked by hx",
 \t\t\t\t},
 \t\t\t};
 \t\t}
@@ -42,5 +42,5 @@ export async function initCommand(): Promise<void> {
 	fs.writeFileSync(path.join(sampleDir, "index.ts"), SAMPLE_EXTENSION, "utf-8")
 
 	console.log("Created .claude/extensions/guard/index.ts")
-	console.log("Run 'clex build' to compile and install hooks.")
+	console.log("Run 'hx build' to compile and install hooks.")
 }

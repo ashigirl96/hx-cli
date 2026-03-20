@@ -1,5 +1,5 @@
 /**
- * ClexAPI — the Extension API exposed to user extensions.
+ * HooksAPI — the Extension API exposed to user extensions.
  *
  * Modeled after pi-mono's ExtensionAPI pattern:
  *   export default defineExtension((cc) => {
@@ -79,10 +79,10 @@ export interface AgentHookConfig {
 }
 
 // ---------------------------------------------------------------------------
-// ClexAPI interface
+// HooksAPI interface
 // ---------------------------------------------------------------------------
 
-export interface ClexAPI {
+export interface HooksAPI {
 	/**
 	 * Register a command hook handler for a matcher-supported event.
 	 * Compiled to a standalone .mjs script at build time.
@@ -115,14 +115,14 @@ export interface ClexAPI {
 // defineExtension — factory pattern (like pi-mono)
 // ---------------------------------------------------------------------------
 
-export type ExtensionFactory = (cc: ClexAPI) => void | Promise<void>
+export type ExtensionFactory = (cc: HooksAPI) => void | Promise<void>
 
 /**
  * Define an extension. Returns the factory function as-is.
  *
  * @example
  * ```ts
- * import { defineExtension } from "clex";
+ * import { defineExtension } from "@dawkinsuke/hooks";
  *
  * export default defineExtension((cc) => {
  *   cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {

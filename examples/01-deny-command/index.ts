@@ -4,7 +4,7 @@
  * Returning permissionDecision: "deny" blocks tool execution.
  * "allow" auto-approves, "ask" prompts the user for confirmation.
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {

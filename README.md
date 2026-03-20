@@ -1,28 +1,28 @@
-# clex
+# @dawkinsuke/hooks
 
-Claude Code Extension SDK — write hooks in TypeScript, compile to `settings.local.json`.
+Claude Code hooks SDK — write hooks in TypeScript, compile to `settings.local.json`.
 
 ```
-Write TypeScript extensions → clex build → hooks & settings ready
+Write TypeScript extensions → hx build → hooks & settings ready
 ```
 
 ## Install
 
 ```bash
-bun install -g clex
+bun install -g @dawkinsuke/hooks
 ```
 
 ## Quick Start
 
 ```bash
 # Scaffold a new project with a sample extension
-clex init
+hx init
 
 # Or create a new extension in an existing project
-clex new my-guard
+hx new my-guard
 
 # Build all extensions
-clex build
+hx build
 ```
 
 This generates `.claude/hooks/dist/*.mjs` and merges hook entries into `.claude/settings.local.json`.
@@ -32,7 +32,7 @@ This generates `.claude/hooks/dist/*.mjs` and merges hook entries into `.claude/
 Create a file in `.claude/extensions/<name>/index.ts`:
 
 ```typescript
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	// Block dangerous Bash commands
@@ -55,10 +55,10 @@ export default defineExtension((cc) => {
 
 ## Four Hook Types
 
-clex supports four ways to register hooks:
+`@dawkinsuke/hooks` supports four ways to register hooks:
 
 ```typescript
-import { defineExtension, HookBlockError } from "clex"
+import { defineExtension, HookBlockError } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	// ── cc.on() — Command hook (compiled to .mjs) ──
@@ -150,7 +150,7 @@ Return `additionalContext` in `hookSpecificOutput` to inject text into Claude's 
 A concise way to block tool execution — throw instead of returning `hookSpecificOutput`:
 
 ```typescript
-import { defineExtension, HookBlockError } from "clex"
+import { defineExtension, HookBlockError } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {
@@ -182,13 +182,13 @@ cc.on("Stop", async (input) => { ... })
 ## CLI
 
 ```
-clex build              Build all enabled extensions
-clex init               Create .claude/extensions/ with a sample extension
-clex new <name>         Scaffold a new extension
-clex list               List all extensions and their status
-clex enable <name>      Enable an extension and rebuild
-clex disable <name>     Disable an extension and rebuild
-clex clean              Remove all clex artifacts
+hx build              Build all enabled extensions
+hx init               Create .claude/extensions/ with a sample extension
+hx new <name>         Scaffold a new extension
+hx list               List all extensions and their status
+hx enable <name>      Enable an extension and rebuild
+hx disable <name>     Disable an extension and rebuild
+hx clean              Remove all hx artifacts
 ```
 
 Options:
@@ -222,14 +222,14 @@ Copy any example into your project:
 
 ```bash
 cp -r examples/01-deny-command .claude/extensions/deny-command
-clex build
+hx build
 ```
 
 ## How It Works
 
 ```
 .claude/extensions/my-ext/index.ts    # You write this
-        ↓ clex build
+        ↓ hx build
 .claude/hooks/dist/my-ext/*.mjs       # Compiled hook scripts
 .claude/settings.local.json           # Hook entries merged in
         ↓ Claude Code reads
@@ -240,7 +240,7 @@ Hooks fire on tool use, prompts, sessions, etc.
 2. **Collect** — Execute the factory to record hook registrations
 3. **Codegen** — Generate entry `.ts` files for each (event, matcher) pair
 4. **Bundle** — Compile to `.mjs` via Bun.build
-5. **Merge** — Write hook entries into `settings.local.json` (clex-managed hooks are tagged and never touch user hooks)
+5. **Merge** — Write hook entries into `settings.local.json` (hx-managed hooks are tagged and never touch user hooks)
 
 ## License
 

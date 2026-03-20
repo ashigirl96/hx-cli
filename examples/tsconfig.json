@@ -8,7 +8,7 @@
 		"skipLibCheck": true,
 		"noEmit": true,
 		"paths": {
-			"clex": ["../src/index.ts"]
+			"@dawkinsuke/hooks": ["../src/index.ts"]
 		}
 	},
 	"include": ["./**/*.ts"]

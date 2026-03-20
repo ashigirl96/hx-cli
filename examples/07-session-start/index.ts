@@ -4,7 +4,7 @@
  * source can be "startup" | "resume" | "clear" | "compact".
  * Use matcher to filter by source (e.g. { matcher: "startup" }).
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("SessionStart", { matcher: "startup" }, async (_input) => {

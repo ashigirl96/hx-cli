@@ -1,6 +1,6 @@
-# clex Examples
+# @dawkinsuke/hooks Examples
 
-Each directory is a self-contained extension you can copy into `.claude/extensions/` and build with `clex build`.
+Each directory is a self-contained extension you can copy into `.claude/extensions/` and build with `hx build`.
 
 ## Usage
 
@@ -9,7 +9,7 @@ Each directory is a self-contained extension you can copy into `.claude/extensio
 cp -r examples/01-deny-command .claude/extensions/deny-command
 
 # Build all extensions
-clex build
+hx build
 ```
 
 ## Hook Registration Types

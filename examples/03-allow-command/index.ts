@@ -4,7 +4,7 @@
  * Returning permissionDecision: "allow" skips the permission prompt.
  * Useful for whitelisting trusted commands.
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {

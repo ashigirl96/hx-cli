@@ -6,7 +6,7 @@
  *   - { behavior: "deny", message?: string } — reject
  *   - updatedInput / updatedPermissions can also be used to rewrite inputs or permissions
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("PermissionRequest", { matcher: "Bash" }, async (input) => {

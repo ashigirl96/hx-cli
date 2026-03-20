@@ -2,7 +2,7 @@
  * Bundler: wraps Bun.build() to produce standalone .mjs files.
  */
 import * as path from "node:path"
-import { clexResolvePlugin } from "./resolve-plugin.js"
+import { hxResolvePlugin } from "./resolve-plugin.js"
 
 export interface BundleOptions {
 	/** Path to the generated entry .ts file */
@@ -24,7 +24,7 @@ export async function bundleEntryScript(options: BundleOptions): Promise<string>
 		target: "node",
 		format: "esm",
 		minify: false,
-		plugins: [clexResolvePlugin],
+		plugins: [hxResolvePlugin],
 	})
 
 	if (!result.success) {

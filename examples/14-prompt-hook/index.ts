@@ -4,7 +4,7 @@
  * Claude Code uses an LLM to evaluate the hook condition.
  * Only supported on PreToolUse, PostToolUse, and PermissionRequest.
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.prompt("PreToolUse", {

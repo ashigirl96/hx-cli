@@ -3,7 +3,7 @@ import { readManifest, writeManifest } from "../../settings/manifest.js"
 
 export async function enableCommand(name?: string, runtime?: string): Promise<void> {
 	if (!name) {
-		console.error("Usage: clex enable <name>")
+		console.error("Usage: hx enable <name>")
 		process.exit(1)
 	}
 

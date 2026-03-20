@@ -25,7 +25,7 @@ export interface HookMatcherGroup {
 /** hooks section of settings.json: event name → array of matcher groups */
 export type SettingsHooks = Record<string, HookMatcherGroup[]>
 
-/** Top-level settings.local.json shape (partial — only what clex touches) */
+/** Top-level settings.local.json shape (partial — only what hx touches) */
 export interface SettingsLocalJson {
 	hooks?: SettingsHooks
 	[key: string]: unknown

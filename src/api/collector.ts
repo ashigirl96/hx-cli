@@ -1,11 +1,11 @@
 /**
- * Collector: a mock ClexAPI that records registrations without executing handlers.
+ * Collector: a mock HooksAPI that records registrations without executing handlers.
  * Used at build time to discover what hooks an extension registers.
  */
 import type { HookEvent } from "@anthropic-ai/claude-agent-sdk"
 import type {
 	AgentHookConfig,
-	ClexAPI,
+	HooksAPI,
 	HttpHookConfig,
 	OnOptionsNoMatcher,
 	OnOptionsWithMatcher,
@@ -68,10 +68,10 @@ export interface CollectedExtension {
 export function createCollector(
 	extensionName: string,
 	extensionPath: string,
-): { api: ClexAPI; result: CollectedExtension } {
+): { api: HooksAPI; result: CollectedExtension } {
 	const registrations: Registration[] = []
 
-	const api: ClexAPI = {
+	const api: HooksAPI = {
 		on(event: HookEvent, ...args: unknown[]): void {
 			// Parse overloaded args: (event, handler) or (event, options, handler)
 			let matcher: string | undefined
@@ -107,7 +107,7 @@ export function createCollector(
 			}
 			registrations.push({ type: "agent", event: event as PromptAgentEvent, config })
 		},
-	} as ClexAPI
+	} as HooksAPI
 
 	return { api, result: { name: extensionName, path: extensionPath, registrations } }
 }

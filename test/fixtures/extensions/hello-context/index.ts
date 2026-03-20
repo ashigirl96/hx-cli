@@ -6,7 +6,7 @@ export default defineExtension((cc) => {
 			hookSpecificOutput: {
 				hookEventName: "PreToolUse" as const,
 				permissionDecision: "deny" as const,
-				permissionDecisionReason: "Hello from clex hook!",
+				permissionDecisionReason: "Hello from hx hook!",
 				additionalContext: "Hello",
 			},
 		}

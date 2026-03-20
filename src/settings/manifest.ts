@@ -1,5 +1,5 @@
 /**
- * Manifest: tracks which hooks in settings.local.json are managed by clex.
+ * Manifest: tracks which hooks in settings.local.json are managed by hx.
  * Stored at .claude/hooks/.manifest.json
  */
 import * as fs from "node:fs"

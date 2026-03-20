@@ -1,4 +1,4 @@
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {
@@ -11,7 +11,7 @@ export default defineExtension((cc) => {
 				hookSpecificOutput: {
 					hookEventName: "PreToolUse" as const,
 					permissionDecision: "deny" as const,
-					permissionDecisionReason: "Destructive command blocked by clex",
+					permissionDecisionReason: "Destructive command blocked by hx",
 				},
 			}
 		}

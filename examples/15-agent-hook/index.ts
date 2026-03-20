@@ -4,7 +4,7 @@
  * Similar to prompt hooks, but the agent can investigate over multiple turns.
  * Only supported on PreToolUse, PostToolUse, and PermissionRequest.
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.agent("PostToolUse", {

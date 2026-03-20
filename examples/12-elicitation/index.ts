@@ -5,7 +5,7 @@
  *   - action: "accept" | "decline" | "cancel"
  *   - content: response data matching the MCP schema
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("Elicitation", async (input) => {
