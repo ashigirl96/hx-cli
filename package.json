@@ -1,10 +1,10 @@
 {
-	"name": "clex",
+	"name": "@dawkinsuke/hooks",
 	"version": "0.1.0",
-	"description": "Claude Code extension SDK — write hooks with TypeScript, compile to settings.local.json",
+	"description": "Claude Code hooks SDK — write hooks with TypeScript, compile to settings.local.json",
 	"license": "MIT",
 	"bin": {
-		"clex": "./src/cli/index.ts"
+		"hx": "./src/cli/index.ts"
 	},
 	"files": [
 		"src",

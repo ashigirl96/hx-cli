@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * clex CLI — Claude Code extension SDK.
+ * hx CLI — Claude Code hooks SDK.
  */
 import { parseArgs } from "node:util"
 import { buildCommand } from "./commands/build.js"
@@ -24,9 +24,9 @@ const { positionals, values } = parseArgs({
 const command = positionals[0]
 
 if (values.help || !command) {
-	console.log(`clex — Claude Code extension SDK
+	console.log(`hx — Claude Code hooks SDK
 
-Usage: clex <command> [options]
+Usage: hx <command> [options]
 
 Commands:
   build              Build all enabled extensions → .claude/hooks/dist/
@@ -35,7 +35,7 @@ Commands:
   list               List all extensions and their status
   enable <name>      Enable an extension and rebuild
   disable <name>     Disable an extension and rebuild
-  clean              Remove all clex artifacts from settings and dist/
+  clean              Remove all hx artifacts from settings and dist/
 
 Options:
   --runtime, -r      Runtime for hooks: "bun" or "node" (auto-detected)

@@ -10,7 +10,7 @@ export async function listCommand(): Promise<void> {
 
 	if (extensions.length === 0) {
 		console.log("No extensions found in .claude/extensions/")
-		console.log("Run 'clex init' to create a sample extension.")
+		console.log("Run 'hx init' to create a sample extension.")
 		return
 	}
 

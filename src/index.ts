@@ -1,5 +1,5 @@
 /**
- * clex — Claude Code extension SDK.
+ * @dawkinsuke/hooks — Claude Code hooks SDK.
  *
  * Write hooks with TypeScript, compile to settings.local.json.
  */
@@ -7,7 +7,7 @@
 // Core API
 export { defineExtension } from "./api/extension-api.js"
 export type {
-	ClexAPI,
+	HooksAPI,
 	ExtensionFactory,
 	HookHandler,
 	HttpHookConfig,

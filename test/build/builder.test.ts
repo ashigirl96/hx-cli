@@ -8,7 +8,7 @@ describe("builder", () => {
 	let tmpDir: string
 
 	beforeEach(() => {
-		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "clex-build-test-"))
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hx-build-test-"))
 		fs.mkdirSync(path.join(tmpDir, ".claude", "extensions"), { recursive: true })
 	})
 
@@ -56,7 +56,7 @@ describe("builder", () => {
 		const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"))
 		expect(settings.hooks?.PreToolUse).toBeDefined()
 		expect(settings.hooks.PreToolUse[0].matcher).toBe("Bash")
-		expect(settings.hooks.PreToolUse[0].hooks[0].command).toContain("clex-managed:")
+		expect(settings.hooks.PreToolUse[0].hooks[0].command).toContain("hx-managed:")
 	})
 
 	test("handles multiple events and matchers", async () => {
@@ -139,7 +139,7 @@ describe("builder", () => {
 		expect(result.errors[0]!.extension).toBe("bad")
 	})
 
-	test("cleans stale clex hooks when all extensions are disabled", async () => {
+	test("cleans stale hx hooks when all extensions are disabled", async () => {
 		// Simulate a previous build that left hooks in settings.local.json
 		const settingsPath = path.join(tmpDir, ".claude", "settings.local.json")
 		fs.writeFileSync(
@@ -149,9 +149,7 @@ describe("builder", () => {
 					PreToolUse: [
 						{
 							matcher: "Bash",
-							hooks: [
-								{ type: "command", command: "bun old.mjs # clex-managed:ext:PreToolUse:Bash" },
-							],
+							hooks: [{ type: "command", command: "bun old.mjs # hx-managed:ext:PreToolUse:Bash" }],
 						},
 					],
 				},
@@ -163,11 +161,11 @@ describe("builder", () => {
 
 		expect(result.extensions).toHaveLength(0)
 		const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"))
-		// Stale clex hooks should be removed
+		// Stale hx hooks should be removed
 		expect(settings.hooks?.PreToolUse).toBeUndefined()
 	})
 
-	test("cleans stale clex hooks when all extensions fail to load", async () => {
+	test("cleans stale hx hooks when all extensions fail to load", async () => {
 		// Previous build left hooks
 		const settingsPath = path.join(tmpDir, ".claude", "settings.local.json")
 		fs.writeFileSync(
@@ -176,7 +174,7 @@ describe("builder", () => {
 				hooks: {
 					Stop: [
 						{
-							hooks: [{ type: "command", command: "bun old.mjs # clex-managed:ext:Stop:" }],
+							hooks: [{ type: "command", command: "bun old.mjs # hx-managed:ext:Stop:" }],
 						},
 					],
 				},
@@ -190,7 +188,7 @@ describe("builder", () => {
 
 		expect(result.errors).toHaveLength(1)
 		const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"))
-		// Stale clex hooks should be removed
+		// Stale hx hooks should be removed
 		expect(settings.hooks?.Stop).toBeUndefined()
 	})
 

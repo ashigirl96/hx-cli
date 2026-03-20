@@ -3,7 +3,7 @@
  *
  * In real projects, a single extension often registers multiple events and hook types.
  */
-import { defineExtension, HookBlockError } from "clex"
+import { defineExtension, HookBlockError } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	// ── Command hook: PreToolUse (with matcher) ──

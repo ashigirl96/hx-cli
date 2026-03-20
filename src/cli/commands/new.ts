@@ -1,7 +1,7 @@
 import * as fs from "node:fs"
 import * as path from "node:path"
 
-const TEMPLATE = `import { defineExtension } from "clex";
+const TEMPLATE = `import { defineExtension } from "@dawkinsuke/hooks";
 
 export default defineExtension((cc) => {
 \t// Add your hooks here
@@ -11,7 +11,7 @@ export default defineExtension((cc) => {
 
 export async function newCommand(name?: string): Promise<void> {
 	if (!name) {
-		console.error("Usage: clex new <name>")
+		console.error("Usage: hx new <name>")
 		process.exit(1)
 	}
 
@@ -27,5 +27,5 @@ export async function newCommand(name?: string): Promise<void> {
 	fs.writeFileSync(path.join(extDir, "index.ts"), TEMPLATE, "utf-8")
 
 	console.log(`Created .claude/extensions/${name}/index.ts`)
-	console.log("Edit the file and run 'clex build' to install hooks.")
+	console.log("Edit the file and run 'hx build' to install hooks.")
 }

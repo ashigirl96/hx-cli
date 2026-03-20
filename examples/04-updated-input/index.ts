@@ -4,7 +4,7 @@
  * Returning updatedInput causes Claude Code to overwrite the tool input.
  * Useful for sanitizing commands or injecting default arguments.
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {

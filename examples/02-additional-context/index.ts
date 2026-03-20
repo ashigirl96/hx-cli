@@ -4,7 +4,7 @@
  * additionalContext is injected as a system-reminder into Claude's conversation.
  * Without permissionDecision, tool execution is not blocked.
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("PreToolUse", async (input) => {

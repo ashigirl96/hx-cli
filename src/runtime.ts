@@ -11,7 +11,7 @@
  * - Output: string → raw stdout | object → JSON stdout | HookBlockError → stderr + exit(2)
  */
 import type { HookEvent, HookJSONOutput } from "@anthropic-ai/claude-agent-sdk"
-import type { ClexAPI, ExtensionFactory } from "./api/extension-api.js"
+import type { HooksAPI, ExtensionFactory } from "./api/extension-api.js"
 
 // ---------------------------------------------------------------------------
 // HookBlockError — throw to block via exit code 2
@@ -60,7 +60,7 @@ export async function runHook(
 		http() {},
 		prompt() {},
 		agent() {},
-	} as ClexAPI
+	} as HooksAPI
 
 	await factory(api)
 

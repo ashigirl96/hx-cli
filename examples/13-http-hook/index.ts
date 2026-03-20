@@ -4,7 +4,7 @@
  * Sends a POST request to the specified URL when a tool event fires.
  * Unlike command hooks, this is not compiled to .mjs — it is written directly to settings.json.
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.http("PostToolUse", {

@@ -8,7 +8,7 @@ describe("hello-context extension runtime", () => {
 	let tmpDir: string
 
 	beforeEach(() => {
-		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "clex-hello-test-"))
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hx-hello-test-"))
 		fs.mkdirSync(path.join(tmpDir, ".claude", "extensions"), { recursive: true })
 	})
 
@@ -31,7 +31,7 @@ describe("hello-context extension runtime", () => {
 						hookSpecificOutput: {
 							hookEventName: "PreToolUse",
 							permissionDecision: "deny",
-							permissionDecisionReason: "Hello from clex hook!",
+							permissionDecisionReason: "Hello from hx hook!",
 							additionalContext: "Hello",
 						},
 					}
@@ -74,7 +74,7 @@ describe("hello-context extension runtime", () => {
 		expect(output.hookSpecificOutput).toEqual({
 			hookEventName: "PreToolUse",
 			permissionDecision: "deny",
-			permissionDecisionReason: "Hello from clex hook!",
+			permissionDecisionReason: "Hello from hx hook!",
 			additionalContext: "Hello",
 		})
 	})

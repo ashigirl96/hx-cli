@@ -3,7 +3,7 @@
  *
  * notification_type can be used to filter notifications.
  */
-import { defineExtension } from "clex"
+import { defineExtension } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	cc.on("Notification", async (input) => {

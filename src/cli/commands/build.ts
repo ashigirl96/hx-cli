@@ -19,7 +19,7 @@ export async function buildCommand(runtime?: string): Promise<void> {
 
 	if (result.extensions.length === 0 && result.errors.length === 0) {
 		console.log("  No extensions found in .claude/extensions/")
-		console.log("  Run 'clex init' to create a sample extension.")
+		console.log("  Run 'hx init' to create a sample extension.")
 	} else {
 		console.log(`\n${result.hookCount} hook(s) written to .claude/settings.local.json`)
 	}

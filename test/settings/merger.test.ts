@@ -9,7 +9,7 @@ describe("settings merger", () => {
 	let tmpDir: string
 
 	beforeEach(() => {
-		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "clex-test-"))
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "hx-test-"))
 		fs.mkdirSync(path.join(tmpDir, ".claude"), { recursive: true })
 	})
 
@@ -33,7 +33,7 @@ describe("settings merger", () => {
 					hooks: [
 						{
 							type: "command",
-							command: "bun hook.mjs # clex-managed:ext:PreToolUse:Bash",
+							command: "bun hook.mjs # hx-managed:ext:PreToolUse:Bash",
 						},
 					],
 				},
@@ -62,31 +62,31 @@ describe("settings merger", () => {
 			}),
 		)
 
-		const clexHooks: SettingsHooks = {
+		const hxHooks: SettingsHooks = {
 			PostToolUse: [
 				{
 					matcher: "Write",
 					hooks: [
 						{
 							type: "command",
-							command: "bun hook.mjs # clex-managed:ext:PostToolUse:Write",
+							command: "bun hook.mjs # hx-managed:ext:PostToolUse:Write",
 						},
 					],
 				},
 			],
 		}
 
-		await mergeSettings(tmpDir, clexHooks)
+		await mergeSettings(tmpDir, hxHooks)
 
 		const settings = readSettings() as { hooks: SettingsHooks }
 		// User hook still there
 		expect(settings.hooks.PreToolUse![0]!.hooks).toHaveLength(1)
 		expect(settings.hooks.PreToolUse![0]!.hooks[0]!.command).toBe("my-custom-hook.sh")
-		// Clex hook added
+		// hx hook added
 		expect(settings.hooks.PostToolUse![0]!.hooks).toHaveLength(1)
 	})
 
-	test("replaces old clex hooks on rebuild", async () => {
+	test("replaces old hx hooks on rebuild", async () => {
 		// First build
 		await mergeSettings(tmpDir, {
 			PreToolUse: [
@@ -95,7 +95,7 @@ describe("settings merger", () => {
 					hooks: [
 						{
 							type: "command",
-							command: "bun old.mjs # clex-managed:ext:PreToolUse:Bash",
+							command: "bun old.mjs # hx-managed:ext:PreToolUse:Bash",
 						},
 					],
 				},
@@ -110,7 +110,7 @@ describe("settings merger", () => {
 					hooks: [
 						{
 							type: "command",
-							command: "bun new.mjs # clex-managed:ext:PreToolUse:Bash",
+							command: "bun new.mjs # hx-managed:ext:PreToolUse:Bash",
 						},
 					],
 				},
@@ -139,7 +139,7 @@ describe("settings merger", () => {
 		expect(settings.permissions).toEqual({ allow: ["Bash(ls:*)"] })
 	})
 
-	test("cleanSettings removes all clex hooks", async () => {
+	test("cleanSettings removes all hx hooks", async () => {
 		fs.writeFileSync(
 			settingsPath(),
 			JSON.stringify({
@@ -151,7 +151,7 @@ describe("settings merger", () => {
 								{ type: "command", command: "user-hook.sh" },
 								{
 									type: "command",
-									command: "bun hook.mjs # clex-managed:ext:PreToolUse:Bash",
+									command: "bun hook.mjs # hx-managed:ext:PreToolUse:Bash",
 								},
 							],
 						},

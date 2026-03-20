@@ -5,7 +5,7 @@ import { cleanSettings } from "../../settings/merger.js"
 export async function cleanCommand(): Promise<void> {
 	const cwd = process.cwd()
 
-	// Remove clex hooks from settings.local.json
+	// Remove hx hooks from settings.local.json
 	await cleanSettings(cwd)
 	console.log("Cleaned hooks from .claude/settings.local.json")
 
