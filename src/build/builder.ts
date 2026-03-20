@@ -8,10 +8,7 @@ import type { HookSettingsEntry, SettingsHooks } from "../types/settings.js"
 import { bundleEntryScript } from "./bundler.js"
 import { artifactName, generateEntryScript } from "./codegen.js"
 import { discoverExtensions } from "./discover.js"
-import { clexResolvePlugin } from "./resolve-plugin.js"
-
-// Register global plugin so dynamic import() of extensions can resolve "clex"
-Bun.plugin(clexResolvePlugin)
+import { ensureClexResolvable } from "./resolve-plugin.js"
 
 // ---------------------------------------------------------------------------
 // Detect runtime (bun or node)
@@ -99,6 +96,9 @@ export async function buildExtensions(
 	const errors: Array<{ extension: string; error: string }> = []
 	const allSettings: SettingsHooks = {}
 	let hookCount = 0
+
+	// Ensure "clex" is resolvable from the project (symlink if needed)
+	const cleanupSymlink = ensureClexResolvable(projectRoot)
 
 	for (const ext of extensions) {
 		if (disabledSet.has(ext.name)) continue
@@ -212,10 +212,13 @@ export async function buildExtensions(
 		}
 	}
 
-	// 6. Merge into settings.local.json (always — strips stale clex entries even when empty)
+	// 6. Clean up temporary symlink
+	cleanupSymlink()
+
+	// 7. Merge into settings.local.json (always — strips stale clex entries even when empty)
 	await mergeSettings(projectRoot, allSettings)
 
-	// 7. Update manifest
+	// 8. Update manifest
 	const newManifest: Manifest = {
 		version: 1,
 		generatedAt: new Date().toISOString(),
