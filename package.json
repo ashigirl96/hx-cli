@@ -18,6 +18,7 @@
 	"scripts": {
 		"test": "bun test",
 		"check": "oxlint --fix . && oxfmt --write .",
+		"ci:check": "oxlint . && oxfmt --check .",
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
