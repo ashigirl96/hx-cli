@@ -5,7 +5,7 @@
  */
 
 // Core API
-export { defineExtension } from "./api/extension-api.js";
+export { defineExtension } from "./api/extension-api.js"
 export type {
 	ClexAPI,
 	ExtensionFactory,
@@ -13,9 +13,10 @@ export type {
 	HttpHookConfig,
 	PromptHookConfig,
 	AgentHookConfig,
+	PromptAgentEvent,
 	OnOptionsWithMatcher,
 	OnOptionsNoMatcher,
-} from "./api/extension-api.js";
+} from "./api/extension-api.js"
 
 // Types (re-exported from Agent SDK)
 export type {
@@ -51,9 +52,9 @@ export type {
 	InstructionsLoadedHookInput,
 	MatcherSupportedEvent,
 	NoMatcherEvent,
-} from "./types/common.js";
+} from "./types/common.js"
 
-export type { HookEventMap } from "./types/events.js";
+export type { HookEventMap } from "./types/events.js"
 
 // Runtime (for generated hook scripts)
-export { runHook, HookBlockError } from "./runtime.js";
+export { runHook, HookBlockError } from "./runtime.js"

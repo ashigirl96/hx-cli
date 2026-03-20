@@ -2,14 +2,14 @@
 /**
  * clex CLI — Claude Code extension SDK.
  */
-import { parseArgs } from "node:util";
-import { buildCommand } from "./commands/build.js";
-import { cleanCommand } from "./commands/clean.js";
-import { disableCommand } from "./commands/disable.js";
-import { enableCommand } from "./commands/enable.js";
-import { initCommand } from "./commands/init.js";
-import { listCommand } from "./commands/list.js";
-import { newCommand } from "./commands/new.js";
+import { parseArgs } from "node:util"
+import { buildCommand } from "./commands/build.js"
+import { cleanCommand } from "./commands/clean.js"
+import { disableCommand } from "./commands/disable.js"
+import { enableCommand } from "./commands/enable.js"
+import { initCommand } from "./commands/init.js"
+import { listCommand } from "./commands/list.js"
+import { newCommand } from "./commands/new.js"
 
 const { positionals, values } = parseArgs({
 	args: Bun.argv.slice(2),
@@ -19,9 +19,9 @@ const { positionals, values } = parseArgs({
 		runtime: { type: "string", short: "r" },
 		help: { type: "boolean", short: "h" },
 	},
-});
+})
 
-const command = positionals[0];
+const command = positionals[0]
 
 if (values.help || !command) {
 	console.log(`clex — Claude Code extension SDK
@@ -40,35 +40,35 @@ Commands:
 Options:
   --runtime, -r      Runtime for hooks: "bun" or "node" (auto-detected)
   --help, -h         Show this help
-`);
-	process.exit(0);
+`)
+	process.exit(0)
 }
 
-const runtimeOpt = values.runtime as string | undefined;
+const runtimeOpt = values.runtime as string | undefined
 
 switch (command) {
 	case "build":
-		await buildCommand(runtimeOpt);
-		break;
+		await buildCommand(runtimeOpt)
+		break
 	case "init":
-		await initCommand();
-		break;
+		await initCommand()
+		break
 	case "new":
-		await newCommand(positionals[1]);
-		break;
+		await newCommand(positionals[1])
+		break
 	case "list":
-		await listCommand();
-		break;
+		await listCommand()
+		break
 	case "enable":
-		await enableCommand(positionals[1], runtimeOpt);
-		break;
+		await enableCommand(positionals[1], runtimeOpt)
+		break
 	case "disable":
-		await disableCommand(positionals[1], runtimeOpt);
-		break;
+		await disableCommand(positionals[1], runtimeOpt)
+		break
 	case "clean":
-		await cleanCommand();
-		break;
+		await cleanCommand()
+		break
 	default:
-		console.error(`Unknown command: ${command}`);
-		process.exit(1);
+		console.error(`Unknown command: ${command}`)
+		process.exit(1)
 }

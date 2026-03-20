@@ -1,9 +1,9 @@
-import { defineExtension } from "clex";
+import { defineExtension } from "clex"
 
 export default defineExtension((cc) => {
 	cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {
-		const toolInput = input.tool_input as Record<string, unknown>;
-		const command = toolInput?.command as string | undefined;
+		const toolInput = input.tool_input as Record<string, unknown>
+		const command = toolInput?.command as string | undefined
 
 		// Block destructive commands
 		if (command?.match(/rm\s+-rf\s+\//)) {
@@ -13,10 +13,10 @@ export default defineExtension((cc) => {
 					permissionDecision: "deny" as const,
 					permissionDecisionReason: "Destructive command blocked by clex",
 				},
-			};
+			}
 		}
 
 		// Allow everything else
-		return {};
-	});
-});
+		return {}
+	})
+})

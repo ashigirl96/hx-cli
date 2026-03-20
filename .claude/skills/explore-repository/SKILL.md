@@ -34,21 +34,25 @@ This clones the repository locally and prints the absolute path to the source co
 Navigate to the path and investigate systematically:
 
 ### 3a. Project overview
+
 - Read the README if it exists
 - Check `package.json`, `Cargo.toml`, `pyproject.toml`, `go.mod`, or equivalent for project metadata
 - Identify the language(s), framework(s), and key dependencies
 
 ### 3b. Directory structure
+
 - Map the top-level directory layout
 - Identify the main source directories, test directories, config files, and documentation
 
 ### 3c. Architecture and patterns
+
 - Identify the entry points (main files, CLI entry, server startup)
 - Trace the core data flow or request lifecycle
 - Note key abstractions, design patterns, and module boundaries
 - Look for configuration and environment setup
 
 ### 3d. Key implementation details
+
 - Identify the most important files (by size, centrality, or naming)
 - Read through core modules to understand the main logic
 - Note any interesting or unusual patterns

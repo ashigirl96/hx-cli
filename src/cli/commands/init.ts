@@ -1,5 +1,5 @@
-import * as fs from "node:fs";
-import * as path from "node:path";
+import * as fs from "node:fs"
+import * as path from "node:path"
 
 const SAMPLE_EXTENSION = `import { defineExtension } from "clex";
 
@@ -23,24 +23,24 @@ export default defineExtension((cc) => {
 \t\treturn {};
 \t});
 });
-`;
+`
 
 export async function initCommand(): Promise<void> {
-	const cwd = process.cwd();
-	const extensionsDir = path.join(cwd, ".claude", "extensions");
+	const cwd = process.cwd()
+	const extensionsDir = path.join(cwd, ".claude", "extensions")
 
 	if (fs.existsSync(extensionsDir)) {
-		const entries = fs.readdirSync(extensionsDir);
+		const entries = fs.readdirSync(extensionsDir)
 		if (entries.length > 0) {
-			console.log(".claude/extensions/ already exists with extensions.");
-			return;
+			console.log(".claude/extensions/ already exists with extensions.")
+			return
 		}
 	}
 
-	const sampleDir = path.join(extensionsDir, "guard");
-	fs.mkdirSync(sampleDir, { recursive: true });
-	fs.writeFileSync(path.join(sampleDir, "index.ts"), SAMPLE_EXTENSION, "utf-8");
+	const sampleDir = path.join(extensionsDir, "guard")
+	fs.mkdirSync(sampleDir, { recursive: true })
+	fs.writeFileSync(path.join(sampleDir, "index.ts"), SAMPLE_EXTENSION, "utf-8")
 
-	console.log("Created .claude/extensions/guard/index.ts");
-	console.log("Run 'clex build' to compile and install hooks.");
+	console.log("Created .claude/extensions/guard/index.ts")
+	console.log("Run 'clex build' to compile and install hooks.")
 }

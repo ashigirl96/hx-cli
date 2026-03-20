@@ -1,20 +1,20 @@
 /**
  * Bundler: wraps Bun.build() to produce standalone .mjs files.
  */
-import * as path from "node:path";
+import * as path from "node:path"
 
 export interface BundleOptions {
 	/** Path to the generated entry .ts file */
-	entryPath: string;
+	entryPath: string
 	/** Output directory for the .mjs file */
-	outDir: string;
+	outDir: string
 	/** Output filename (including .mjs extension) */
-	outName: string;
+	outName: string
 }
 
 export async function bundleEntryScript(options: BundleOptions): Promise<string> {
-	const { entryPath, outDir, outName } = options;
-	const outPath = path.join(outDir, outName);
+	const { entryPath, outDir, outName } = options
+	const outPath = path.join(outDir, outName)
 
 	const result = await Bun.build({
 		entrypoints: [entryPath],
@@ -23,12 +23,12 @@ export async function bundleEntryScript(options: BundleOptions): Promise<string>
 		target: "node",
 		format: "esm",
 		minify: false,
-	});
+	})
 
 	if (!result.success) {
-		const errors = result.logs.map((l) => l.message).join("\n");
-		throw new Error(`Bundle failed for ${entryPath}:\n${errors}`);
+		const errors = result.logs.map((l) => l.message).join("\n")
+		throw new Error(`Bundle failed for ${entryPath}:\n${errors}`)
 	}
 
-	return outPath;
+	return outPath
 }

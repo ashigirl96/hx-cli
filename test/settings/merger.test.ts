@@ -1,28 +1,28 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import * as fs from "node:fs";
-import * as os from "node:os";
-import * as path from "node:path";
-import { cleanSettings, mergeSettings } from "../../src/settings/merger.js";
-import type { SettingsHooks } from "../../src/types/settings.js";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test"
+import * as fs from "node:fs"
+import * as os from "node:os"
+import * as path from "node:path"
+import { cleanSettings, mergeSettings } from "../../src/settings/merger.js"
+import type { SettingsHooks } from "../../src/types/settings.js"
 
 describe("settings merger", () => {
-	let tmpDir: string;
+	let tmpDir: string
 
 	beforeEach(() => {
-		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "clex-test-"));
-		fs.mkdirSync(path.join(tmpDir, ".claude"), { recursive: true });
-	});
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "clex-test-"))
+		fs.mkdirSync(path.join(tmpDir, ".claude"), { recursive: true })
+	})
 
 	afterEach(() => {
-		fs.rmSync(tmpDir, { recursive: true });
-	});
+		fs.rmSync(tmpDir, { recursive: true })
+	})
 
 	function settingsPath(): string {
-		return path.join(tmpDir, ".claude", "settings.local.json");
+		return path.join(tmpDir, ".claude", "settings.local.json")
 	}
 
 	function readSettings(): Record<string, unknown> {
-		return JSON.parse(fs.readFileSync(settingsPath(), "utf-8"));
+		return JSON.parse(fs.readFileSync(settingsPath(), "utf-8"))
 	}
 
 	test("creates settings.local.json if it does not exist", async () => {
@@ -38,13 +38,13 @@ describe("settings merger", () => {
 					],
 				},
 			],
-		};
+		}
 
-		await mergeSettings(tmpDir, hooks);
+		await mergeSettings(tmpDir, hooks)
 
-		const settings = readSettings();
-		expect(settings.hooks).toBeDefined();
-	});
+		const settings = readSettings()
+		expect(settings.hooks).toBeDefined()
+	})
 
 	test("preserves user hooks", async () => {
 		// Write existing user hooks
@@ -60,7 +60,7 @@ describe("settings merger", () => {
 					],
 				},
 			}),
-		);
+		)
 
 		const clexHooks: SettingsHooks = {
 			PostToolUse: [
@@ -74,17 +74,17 @@ describe("settings merger", () => {
 					],
 				},
 			],
-		};
+		}
 
-		await mergeSettings(tmpDir, clexHooks);
+		await mergeSettings(tmpDir, clexHooks)
 
-		const settings = readSettings() as { hooks: SettingsHooks };
+		const settings = readSettings() as { hooks: SettingsHooks }
 		// User hook still there
-		expect(settings.hooks.PreToolUse![0]!.hooks).toHaveLength(1);
-		expect(settings.hooks.PreToolUse![0]!.hooks[0]!.command).toBe("my-custom-hook.sh");
+		expect(settings.hooks.PreToolUse![0]!.hooks).toHaveLength(1)
+		expect(settings.hooks.PreToolUse![0]!.hooks[0]!.command).toBe("my-custom-hook.sh")
 		// Clex hook added
-		expect(settings.hooks.PostToolUse![0]!.hooks).toHaveLength(1);
-	});
+		expect(settings.hooks.PostToolUse![0]!.hooks).toHaveLength(1)
+	})
 
 	test("replaces old clex hooks on rebuild", async () => {
 		// First build
@@ -100,7 +100,7 @@ describe("settings merger", () => {
 					],
 				},
 			],
-		});
+		})
 
 		// Second build with different hook
 		await mergeSettings(tmpDir, {
@@ -115,14 +115,14 @@ describe("settings merger", () => {
 					],
 				},
 			],
-		});
+		})
 
-		const settings = readSettings() as { hooks: SettingsHooks };
-		const bashHooks = settings.hooks.PreToolUse![0]!.hooks;
+		const settings = readSettings() as { hooks: SettingsHooks }
+		const bashHooks = settings.hooks.PreToolUse![0]!.hooks
 		// Only the new one, not both
-		expect(bashHooks).toHaveLength(1);
-		expect(bashHooks[0]!.command).toContain("new.mjs");
-	});
+		expect(bashHooks).toHaveLength(1)
+		expect(bashHooks[0]!.command).toContain("new.mjs")
+	})
 
 	test("preserves non-hooks settings", async () => {
 		fs.writeFileSync(
@@ -131,13 +131,13 @@ describe("settings merger", () => {
 				permissions: { allow: ["Bash(ls:*)"] },
 				hooks: {},
 			}),
-		);
+		)
 
-		await mergeSettings(tmpDir, {});
+		await mergeSettings(tmpDir, {})
 
-		const settings = readSettings();
-		expect(settings.permissions).toEqual({ allow: ["Bash(ls:*)"] });
-	});
+		const settings = readSettings()
+		expect(settings.permissions).toEqual({ allow: ["Bash(ls:*)"] })
+	})
 
 	test("cleanSettings removes all clex hooks", async () => {
 		fs.writeFileSync(
@@ -158,13 +158,13 @@ describe("settings merger", () => {
 					],
 				},
 			}),
-		);
+		)
 
-		await cleanSettings(tmpDir);
+		await cleanSettings(tmpDir)
 
-		const settings = readSettings() as { hooks: SettingsHooks };
+		const settings = readSettings() as { hooks: SettingsHooks }
 		// User hook preserved
-		expect(settings.hooks.PreToolUse![0]!.hooks).toHaveLength(1);
-		expect(settings.hooks.PreToolUse![0]!.hooks[0]!.command).toBe("user-hook.sh");
-	});
-});
+		expect(settings.hooks.PreToolUse![0]!.hooks).toHaveLength(1)
+		expect(settings.hooks.PreToolUse![0]!.hooks[0]!.command).toBe("user-hook.sh")
+	})
+})
