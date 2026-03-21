@@ -219,6 +219,10 @@ Hooks fire on tool use, prompts, sessions, etc.
 4. **Bundle** — Compile to `.mjs` via Bun.build
 5. **Merge** — Write hook entries into `settings.local.json` (hx-managed hooks are tagged and never touch user hooks)
 
+## Acknowledgments
+
+This project was inspired by [pi-mono](https://github.com/badlogic/pi-mono) by Mario Zechner — particularly the coding-agent extension system. The TypeScript-first, event-driven hook architecture in hx-cli is built with great respect for pi's design.
+
 ## License
 
 MIT
