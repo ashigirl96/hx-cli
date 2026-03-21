@@ -1,6 +1,6 @@
 {
 	"hooks": {
-		"after:bump": "oxfmt --write CHANGELOG.md"
+		"after:bump": "[ -f CHANGELOG.md ] && oxfmt --write CHANGELOG.md || true"
 	},
 	"git": {
 		"commitMessage": "release: v${version}",
