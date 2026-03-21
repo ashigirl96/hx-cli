@@ -21,7 +21,9 @@ jobs:
       - name: Determine release type
         id: release
         run: |
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+          if [[ "$GITHUB_REF" == refs/tags/v*-* ]]; then
+            echo "type=prerelease" >> "$GITHUB_OUTPUT"
+          elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             echo "type=stable" >> "$GITHUB_OUTPUT"
           elif [[ "${{ github.event.head_commit.message }}" == release:* ]]; then
             echo "type=skip" >> "$GITHUB_OUTPUT"
@@ -47,6 +49,10 @@ jobs:
       - name: Publish stable
         if: steps.release.outputs.type == 'stable'
         run: npm publish --provenance
+
+      - name: Publish pre-release
+        if: steps.release.outputs.type == 'prerelease'
+        run: npm publish --provenance --tag beta
 
       - name: Publish canary
         if: steps.release.outputs.type == 'canary'
