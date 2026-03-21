@@ -6,6 +6,10 @@ Claude Code hooks toolkit — write hooks in TypeScript, compile to `settings.lo
 Write TypeScript extensions → hx build → hooks & settings ready
 ```
 
+![test_2x](https://github.com/user-attachments/assets/44d9520a-bf01-4767-9b81-6705094539ae)
+
+
+
 ## Prerequisites
 
 - [Bun](https://bun.sh/) v1.0.0 or later
