@@ -3,8 +3,6 @@ name: Publish
 on:
   push:
     tags: ["v*"]
-    branches: [main]
-    paths: [src/**, package.json]
 
 jobs:
   publish:
@@ -18,36 +16,11 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun test
 
-      - name: Determine release type
-        id: release
-        run: |
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            echo "type=stable" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == release:* ]]; then
-            echo "type=skip" >> "$GITHUB_OUTPUT"
-          else
-            echo "type=canary" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Set canary version
-        if: steps.release.outputs.type == 'canary'
-        run: |
-          SHA=$(git rev-parse --short HEAD)
-          TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          npm version "$(node -p "require('./package.json').version")-canary.${TIMESTAMP}.${SHA}" --no-git-tag-version
-
       - uses: actions/setup-node@v4
-        if: steps.release.outputs.type != 'skip'
         with:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
-      - if: steps.release.outputs.type != 'skip'
-        run: npm install -g npm@latest
+      - run: npm install -g npm@latest
 
-      - name: Publish stable
-        if: steps.release.outputs.type == 'stable'
+      - name: Publish
         run: npm publish --provenance
-
-      - name: Publish canary
-        if: steps.release.outputs.type == 'canary'
-        run: npm publish --provenance --tag canary
