@@ -27,14 +27,17 @@
 		"check": "oxlint --fix . && oxfmt --write .",
 		"ci:check": "oxlint . && oxfmt --check .",
 		"typecheck": "tsc --noEmit",
-		"prepare": "lefthook install"
+		"prepare": "lefthook install",
+		"release": "release-it"
 	},
 	"devDependencies": {
 		"@anthropic-ai/claude-agent-sdk": "latest",
+		"@release-it/conventional-changelog": "^10.0.6",
 		"@types/bun": "latest",
 		"lefthook": "^2.1.4",
 		"oxfmt": "latest",
 		"oxlint": "latest",
+		"release-it": "^19.2.4",
 		"typescript": "^5.7.0"
 	},
 	"peerDependencies": {

@@ -1,18 +1,8 @@
 name: Publish
 
 on:
-  workflow_dispatch:
-    inputs:
-      bump:
-        description: "Version bump type (leave empty for canary)"
-        required: false
-        type: choice
-        options:
-          - canary
-          - patch
-          - minor
-          - major
   push:
+    tags: ["v*"]
     branches: [main]
     paths: [src/**, package.json]
 
@@ -31,19 +21,13 @@ jobs:
       - name: Determine release type
         id: release
         run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            echo "type=canary" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "type=stable" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.head_commit.message }}" == release:* ]]; then
+            echo "type=skip" >> "$GITHUB_OUTPUT"
           else
-            echo "type=${{ inputs.bump }}" >> "$GITHUB_OUTPUT"
+            echo "type=canary" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Bump stable version
-        if: steps.release.outputs.type != 'canary'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          npm version ${{ steps.release.outputs.type }} -m "release: v%s"
-          git push --follow-tags
 
       - name: Set canary version
         if: steps.release.outputs.type == 'canary'
@@ -53,13 +37,15 @@ jobs:
           npm version "$(node -p "require('./package.json').version")-canary.${TIMESTAMP}.${SHA}" --no-git-tag-version
 
       - uses: actions/setup-node@v4
+        if: steps.release.outputs.type != 'skip'
         with:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
-      - run: npm install -g npm@latest
+      - if: steps.release.outputs.type != 'skip'
+        run: npm install -g npm@latest
 
       - name: Publish stable
-        if: steps.release.outputs.type != 'canary'
+        if: steps.release.outputs.type == 'stable'
         run: npm publish --provenance
 
       - name: Publish canary
