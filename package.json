@@ -28,7 +28,7 @@
 		"ci:check": "oxlint . && oxfmt --check .",
 		"typecheck": "tsc --noEmit",
 		"prepare": "lefthook install",
-		"release": "release-it"
+		"release": "GITHUB_TOKEN=$(gh auth token) release-it"
 	},
 	"devDependencies": {
 		"@anthropic-ai/claude-agent-sdk": "latest",
