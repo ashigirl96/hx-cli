@@ -79,7 +79,7 @@ export default defineExtension((cc) => {
 })
 ```
 
-Then run `hx build` to compile and activate.
+Then run `hx build` to compile. Use `hx activate` to toggle extensions on/off.
 
 ## Writing Extensions
 
