@@ -1,22 +1,21 @@
-import { defineExtension } from "@dawkinsuke/hooks"
+import { defineExtension, deny, modifyInput } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
-	cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {
-		const toolInput = input.tool_input as Record<string, unknown>
-		const command = toolInput?.command as string | undefined
-
-		// Block destructive commands
-		if (command?.match(/rm\s+-rf\s+\//)) {
-			return {
-				hookSpecificOutput: {
-					hookEventName: "PreToolUse" as const,
-					permissionDecision: "deny" as const,
-					permissionDecisionReason: "Destructive command blocked by hx",
-				},
-			}
+	// Block destructive commands
+	cc.on("PreToolUse", "Bash", async (input) => {
+		if (input.tool_input.command?.match(/rm\s+-rf\s+\//)) {
+			return deny("Destructive command blocked by hx")
 		}
+	})
 
-		// Allow everything else
-		return {}
+	// Run ci:check and test before git commit
+	cc.on("PreToolUse", "Bash", async (input) => {
+		const command = input.tool_input.command as string | undefined
+		if (command && /git\s+commit/.test(command)) {
+			return modifyInput({
+				...input.tool_input,
+				command: `bun run ci:check && bun test && ${command}`,
+			})
+		}
 	})
 })
