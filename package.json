@@ -1,6 +1,6 @@
 {
 	"name": "@dawkinsuke/hooks",
-	"version": "0.0.2",
+	"version": "0.0.1",
 	"description": "Claude Code hooks toolkit — write hooks with TypeScript, compile to settings.local.json",
 	"license": "MIT",
 	"repository": {
