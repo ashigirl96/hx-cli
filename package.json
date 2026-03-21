@@ -1,6 +1,6 @@
 {
 	"name": "@dawkinsuke/hooks",
-	"version": "0.2.1-beta.0",
+	"version": "0.0.1",
 	"description": "Claude Code hooks toolkit — write hooks with TypeScript, compile to settings.local.json",
 	"license": "MIT",
 	"repository": {
@@ -28,12 +28,10 @@
 		"ci:check": "oxlint . && oxfmt --check .",
 		"typecheck": "tsc --noEmit",
 		"prepare": "lefthook install",
-		"release": "GITHUB_TOKEN=$(gh auth token) release-it --preRelease=beta --increment=prerelease",
-		"release:stable": "GITHUB_TOKEN=$(gh auth token) release-it"
+		"release": "GITHUB_TOKEN=$(gh auth token) release-it --increment=patch"
 	},
 	"devDependencies": {
 		"@anthropic-ai/claude-agent-sdk": "latest",
-		"@release-it/conventional-changelog": "^10.0.6",
 		"@types/bun": "latest",
 		"lefthook": "^2.1.4",
 		"oxfmt": "latest",
