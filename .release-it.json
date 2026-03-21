@@ -1,4 +1,7 @@
 {
+	"hooks": {
+		"after:bump": "oxfmt --write CHANGELOG.md"
+	},
 	"git": {
 		"commitMessage": "release: v${version}",
 		"tagName": "v${version}"
