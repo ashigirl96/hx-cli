@@ -31,13 +31,13 @@ hx init        # creates .claude/extensions/guard/index.ts with a sample hook
 hx build       # compiles to .claude/hooks/ and updates settings.local.json
 ```
 
-With the plugin installed, ask Claude to create hooks for you:
+With the plugin installed, ask Claude to create hooks in natural language:
 
 ```
-> /hook-creator:hook-creator Create a hook that blocks git push
+> /hook-creator Create a hook that blocks git push
 ```
 
-Creates `.claude/extensions/block-push/index.ts`:
+This generates `.claude/extensions/block-push/index.ts`:
 
 ```typescript
 import { defineExtension, deny } from "@dawkinsuke/hooks"
@@ -51,11 +51,11 @@ export default defineExtension((cc) => {
 })
 ```
 
-```
-> /hook-creator:hook-creator Create a hook that runs bun test before git commit when src/ files are staged
-```
+You can keep going — just describe what you want:
 
-Creates `.claude/extensions/auto-test/index.ts`:
+```
+> Create a hook that runs bun test before git commit when src/ files are staged
+```
 
 ```typescript
 import { execSync } from "node:child_process"
@@ -79,7 +79,8 @@ export default defineExtension((cc) => {
 })
 ```
 
-Then run `hx build` to compile. Use `hx activate` to toggle extensions on/off.
+The hook-creator skill automatically runs `hx build` — hooks are active immediately 🎉
+Use `hx activate` to toggle extensions on/off.
 
 ## Writing Extensions
 
