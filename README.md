@@ -28,11 +28,6 @@ Optionally, install the Claude Code plugin so Claude can create hooks for you in
 
 ## Quick Start
 
-```bash
-hx init        # creates .claude/extensions/guard/index.ts with a sample hook
-hx build       # compiles to .claude/hooks/ and updates settings.local.json
-```
-
 With the plugin installed, ask Claude to create hooks in natural language:
 
 ```
