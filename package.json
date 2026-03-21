@@ -12,7 +12,9 @@
 	},
 	"files": [
 		"src",
-		"templates"
+		"templates",
+		"bunli.config.ts",
+		".bunli"
 	],
 	"type": "module",
 	"exports": {
@@ -30,9 +32,15 @@
 		"prepare": "lefthook install",
 		"release": "GITHUB_TOKEN=$(gh auth token) release-it --increment=patch"
 	},
+	"dependencies": {
+		"@bunli/core": "^0.8.2",
+		"@bunli/plugin-completions": "^0.3.4",
+		"zod": "^4.3.6"
+	},
 	"devDependencies": {
 		"@anthropic-ai/claude-agent-sdk": "latest",
 		"@types/bun": "latest",
+		"bunli": "^0.8.2",
 		"lefthook": "^2.1.4",
 		"oxfmt": "latest",
 		"oxlint": "latest",

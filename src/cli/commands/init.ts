@@ -1,3 +1,4 @@
+import { defineCommand } from "@bunli/core"
 import * as fs from "node:fs"
 import * as path from "node:path"
 
@@ -25,22 +26,26 @@ export default defineExtension((cc) => {
 });
 `
 
-export async function initCommand(): Promise<void> {
-	const cwd = process.cwd()
-	const extensionsDir = path.join(cwd, ".claude", "extensions")
+export default defineCommand({
+	name: "init",
+	description: "Create .claude/extensions/ with a sample extension",
+	handler: async () => {
+		const cwd = process.cwd()
+		const extensionsDir = path.join(cwd, ".claude", "extensions")
 
-	if (fs.existsSync(extensionsDir)) {
-		const entries = fs.readdirSync(extensionsDir)
-		if (entries.length > 0) {
-			console.log(".claude/extensions/ already exists with extensions.")
-			return
+		if (fs.existsSync(extensionsDir)) {
+			const entries = fs.readdirSync(extensionsDir)
+			if (entries.length > 0) {
+				console.log(".claude/extensions/ already exists with extensions.")
+				return
+			}
 		}
-	}
 
-	const sampleDir = path.join(extensionsDir, "guard")
-	fs.mkdirSync(sampleDir, { recursive: true })
-	fs.writeFileSync(path.join(sampleDir, "index.ts"), SAMPLE_EXTENSION, "utf-8")
+		const sampleDir = path.join(extensionsDir, "guard")
+		fs.mkdirSync(sampleDir, { recursive: true })
+		fs.writeFileSync(path.join(sampleDir, "index.ts"), SAMPLE_EXTENSION, "utf-8")
 
-	console.log("Created .claude/extensions/guard/index.ts")
-	console.log("Run 'hx build' to compile and install hooks.")
-}
+		console.log("Created .claude/extensions/guard/index.ts")
+		console.log("Run 'hx build' to compile and install hooks.")
+	},
+})
