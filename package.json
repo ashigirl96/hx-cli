@@ -8,7 +8,7 @@
 		"url": "git+https://github.com/ashigirl96/hx-cli.git"
 	},
 	"bin": {
-		"hx": "./src/cli/index.ts"
+		"hx": "src/cli/index.ts"
 	},
 	"files": [
 		"src",
@@ -38,7 +38,7 @@
 		"typescript": "^5.7.0"
 	},
 	"peerDependencies": {
-		"@anthropic-ai/claude-agent-sdk": "*"
+		"@anthropic-ai/claude-agent-sdk": ">=0.2.0"
 	},
 	"peerDependenciesMeta": {
 		"@anthropic-ai/claude-agent-sdk": {
