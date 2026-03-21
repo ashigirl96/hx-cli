@@ -4,7 +4,8 @@
 	},
 	"git": {
 		"commitMessage": "release: v${version}",
-		"tagName": "v${version}"
+		"tagName": "v${version}",
+		"pushArgs": ["--no-verify"]
 	},
 	"github": {
 		"release": true,
