@@ -25,7 +25,7 @@ hx new my-guard
 hx build
 ```
 
-This generates `.claude/hooks/dist/*.mjs` and merges hook entries into `.claude/settings.local.json`.
+This generates `.claude/hooks/<name>.mjs` and merges hook entries into `.claude/settings.local.json`.
 
 ## Writing Extensions
 
@@ -207,7 +207,7 @@ hx build
 ```
 .claude/extensions/my-ext/index.ts    # You write this
         ↓ hx build
-.claude/hooks/dist/my-ext/*.mjs       # Compiled hook scripts
+.claude/hooks/my-ext.mjs              # Compiled hook script (one per extension)
 .claude/settings.local.json           # Hook entries merged in
         ↓ Claude Code reads
 Hooks fire on tool use, prompts, sessions, etc.
@@ -215,9 +215,14 @@ Hooks fire on tool use, prompts, sessions, etc.
 
 1. **Discover** — Find all `.ts` files in `.claude/extensions/`
 2. **Collect** — Execute the factory to record hook registrations
-3. **Codegen** — Generate entry `.ts` files for each (event, matcher) pair
-4. **Bundle** — Compile to `.mjs` via Bun.build
-5. **Merge** — Write hook entries into `settings.local.json` (hx-managed hooks are tagged and never touch user hooks)
+3. **Bundle** — Compile to a single `.mjs` per extension via Bun.build (in-memory, no intermediate files)
+4. **Merge** — Write hook entries into `settings.local.json` (hx-managed hooks are tagged and never touch user hooks)
+
+Each settings entry invokes the same `.mjs` with event/matcher as CLI args:
+
+```
+bun .claude/hooks/my-ext.mjs PreToolUse Bash
+```
 
 ## Acknowledgments
 

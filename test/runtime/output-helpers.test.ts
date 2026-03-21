@@ -36,14 +36,7 @@ describe("output helpers E2E", () => {
 		expect(result.errors).toHaveLength(0)
 		expect(result.hookCount).toBeGreaterThanOrEqual(1)
 
-		const mjsPath = path.join(
-			tmpDir,
-			".claude",
-			"hooks",
-			"dist",
-			"deny-test",
-			"PreToolUse__Bash.mjs",
-		)
+		const mjsPath = path.join(tmpDir, ".claude", "hooks", "deny-test.mjs")
 		expect(fs.existsSync(mjsPath)).toBe(true)
 
 		const stdinPayload = JSON.stringify({
@@ -55,7 +48,7 @@ describe("output helpers E2E", () => {
 			cwd: tmpDir,
 		})
 
-		const proc = Bun.spawn(["bun", mjsPath], {
+		const proc = Bun.spawn(["bun", mjsPath, "PreToolUse", "Bash"], {
 			stdin: new Blob([stdinPayload]),
 			stdout: "pipe",
 			stderr: "pipe",
@@ -93,14 +86,7 @@ describe("output helpers E2E", () => {
 		const result = await buildExtensions(tmpDir, "bun")
 		expect(result.errors).toHaveLength(0)
 
-		const mjsPath = path.join(
-			tmpDir,
-			".claude",
-			"hooks",
-			"dist",
-			"matcher-test",
-			"PreToolUse__Edit.mjs",
-		)
+		const mjsPath = path.join(tmpDir, ".claude", "hooks", "matcher-test.mjs")
 		expect(fs.existsSync(mjsPath)).toBe(true)
 
 		const stdinPayload = JSON.stringify({
@@ -112,7 +98,7 @@ describe("output helpers E2E", () => {
 			cwd: tmpDir,
 		})
 
-		const proc = Bun.spawn(["bun", mjsPath], {
+		const proc = Bun.spawn(["bun", mjsPath, "PreToolUse", "Edit"], {
 			stdin: new Blob([stdinPayload]),
 			stdout: "pipe",
 			stderr: "pipe",
@@ -149,14 +135,7 @@ describe("output helpers E2E", () => {
 		const result = await buildExtensions(tmpDir, "bun")
 		expect(result.errors).toHaveLength(0)
 
-		const mjsPath = path.join(
-			tmpDir,
-			".claude",
-			"hooks",
-			"dist",
-			"chain-test",
-			"PreToolUse__Bash.mjs",
-		)
+		const mjsPath = path.join(tmpDir, ".claude", "hooks", "chain-test.mjs")
 		expect(fs.existsSync(mjsPath)).toBe(true)
 
 		const stdinPayload = JSON.stringify({
@@ -168,7 +147,7 @@ describe("output helpers E2E", () => {
 			cwd: tmpDir,
 		})
 
-		const proc = Bun.spawn(["bun", mjsPath], {
+		const proc = Bun.spawn(["bun", mjsPath, "PreToolUse", "Bash"], {
 			stdin: new Blob([stdinPayload]),
 			stdout: "pipe",
 			stderr: "pipe",

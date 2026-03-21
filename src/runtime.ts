@@ -2,7 +2,10 @@
  * Runtime: the stdin→handler→stdout bridge that gets bundled into each generated hook script.
  *
  * Generated entry scripts call:
- *   runHook("PreToolUse", "Bash", extensionFactory);
+ *   runHook(extensionFactory);
+ *
+ * Event and matcher are passed via CLI args:
+ *   bun guard.mjs PreToolUse Bash
  *
  * Protocol:
  * - Read JSON from stdin (or empty for some events)
@@ -31,11 +34,16 @@ export class HookBlockError extends Error {
 
 type AnyHandler = (input: unknown) => Promise<unknown> | unknown
 
-export async function runHook(
-	targetEvent: HookEvent,
-	targetMatcher: string | undefined,
-	factory: ExtensionFactory,
-): Promise<void> {
+export async function runHook(factory: ExtensionFactory): Promise<void> {
+	// 0. Parse event and matcher from CLI args
+	const targetEvent = process.argv[2] as HookEvent
+	const targetMatcher: string | undefined = process.argv[3] || undefined
+
+	if (!targetEvent) {
+		process.stderr.write("Usage: <script> <event> [matcher]\n")
+		process.exit(1)
+	}
+
 	// 1. Collect handlers by re-executing the factory
 	const handlers: AnyHandler[] = []
 
@@ -107,6 +115,16 @@ export async function runHook(
 		// Raw string output (e.g., WorktreeCreate returns an absolute path)
 		process.stdout.write(result)
 	} else if (isHookOutput(result)) {
+		// Show visible context to user via macOS notification
+		if (result._visible && result._context) {
+			try {
+				const msg = result._context.replaceAll('"', '\\"')
+				const script = `display notification "${msg}" with title "hx"`
+				await Bun.$`osascript -e ${script}`.quiet()
+			} catch {
+				// Notification unavailable (e.g., CI, Linux) — silently skip
+			}
+		}
 		// HookOutput builder → resolve to wire format based on target event
 		const resolved = result._resolve(targetEvent)
 		process.stdout.write(JSON.stringify(resolved))

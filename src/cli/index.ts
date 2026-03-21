@@ -29,13 +29,13 @@ if (values.help || !command) {
 Usage: hx <command> [options]
 
 Commands:
-  build              Build all enabled extensions → .claude/hooks/dist/
+  build              Build all enabled extensions → .claude/hooks/
   init               Create .claude/extensions/ with a sample extension
   new <name>         Scaffold a new extension
   list               List all extensions and their status
   enable <name>      Enable an extension and rebuild
   disable <name>     Disable an extension and rebuild
-  clean              Remove all hx artifacts from settings and dist/
+  clean              Remove all hx artifacts from settings and hooks/
 
 Options:
   --runtime, -r      Runtime for hooks: "bun" or "node" (auto-detected)
