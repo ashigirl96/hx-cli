@@ -1,0 +1,32 @@
+name: Canary
+
+on:
+  push:
+    branches: [main]
+    paths: [src/**, package.json]
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun test
+
+      - name: Set canary version
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          npm version "$(node -p "require('./package.json').version")-canary.${TIMESTAMP}.${SHA}" --no-git-tag-version
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+      - run: npm publish --provenance --tag canary
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
