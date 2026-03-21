@@ -11,6 +11,7 @@
 import type { HookEvent, HookJSONOutput } from "@anthropic-ai/claude-agent-sdk"
 import type { MatcherSupportedEvent, NoMatcherEvent } from "../types/common.js"
 import type { HookEventMap } from "../types/events.js"
+import type { HookOutput } from "./output.js"
 
 // ---------------------------------------------------------------------------
 // Events that support prompt/agent (LLM-based) hook types
@@ -28,8 +29,8 @@ export type PromptAgentEvent = "PreToolUse" | "PostToolUse" | "PermissionRequest
 
 /** Return type varies: WorktreeCreate may return a path string. */
 type HookHandlerReturn<E extends HookEvent> = E extends "WorktreeCreate"
-	? HookJSONOutput | string
-	: HookJSONOutput
+	? HookJSONOutput | HookOutput | string
+	: HookJSONOutput | HookOutput
 
 /** Handler receives typed input, returns wire-format output or void. */
 export type HookHandler<E extends HookEvent> = (
@@ -92,6 +93,7 @@ export interface HooksAPI {
 		options: OnOptionsWithMatcher,
 		handler: HookHandler<E>,
 	): void
+	on<E extends MatcherSupportedEvent>(event: E, matcher: string, handler: HookHandler<E>): void
 	on<E extends MatcherSupportedEvent>(event: E, handler: HookHandler<E>): void
 
 	/**

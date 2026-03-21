@@ -12,6 +12,7 @@
  */
 import type { HookEvent, HookJSONOutput } from "@anthropic-ai/claude-agent-sdk"
 import type { HooksAPI, ExtensionFactory } from "./api/extension-api.js"
+import { isHookOutput } from "./api/output.js"
 
 // ---------------------------------------------------------------------------
 // HookBlockError — throw to block via exit code 2
@@ -40,11 +41,18 @@ export async function runHook(
 
 	const api = {
 		on(event: HookEvent, ...args: unknown[]): void {
-			// Parse overloaded args
+			// Parse overloaded args:
+			//   (event, handler)
+			//   (event, options, handler)
+			//   (event, matcher: string, handler)
 			let matcher: string | undefined
 			let handler: AnyHandler
 
-			if (args.length >= 2 && typeof args[0] === "object" && args[0] !== null) {
+			if (args.length >= 2 && typeof args[0] === "string") {
+				// String matcher shorthand: on("PreToolUse", "Bash", handler)
+				matcher = args[0]
+				handler = args[1] as AnyHandler
+			} else if (args.length >= 2 && typeof args[0] === "object" && args[0] !== null) {
 				const opts = args[0] as { matcher?: string }
 				matcher = opts.matcher
 				handler = args[1] as AnyHandler
@@ -98,8 +106,12 @@ export async function runHook(
 	if (typeof result === "string") {
 		// Raw string output (e.g., WorktreeCreate returns an absolute path)
 		process.stdout.write(result)
+	} else if (isHookOutput(result)) {
+		// HookOutput builder → resolve to wire format based on target event
+		const resolved = result._resolve(targetEvent)
+		process.stdout.write(JSON.stringify(resolved))
 	} else {
-		// JSON output (standard hook response)
+		// Raw HookJSONOutput (backward compat)
 		process.stdout.write(JSON.stringify(result as HookJSONOutput))
 	}
 }

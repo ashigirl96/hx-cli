@@ -2,7 +2,7 @@ import { defineExtension } from "../../../../src/index.js"
 
 export default defineExtension((cc) => {
 	// Command hook
-	cc.on("PreToolUse", { matcher: "Bash" }, async () => ({}))
+	cc.on("PreToolUse", "Bash", async () => ({}))
 
 	// HTTP hook
 	cc.http("PostToolUse", {

@@ -32,10 +32,16 @@ import type {
 } from "@anthropic-ai/claude-agent-sdk"
 import type { NoMatcherEvent } from "./common.js"
 
+/**
+ * Relax `tool_input` from `unknown` to `Record<string, any>` so users
+ * can access properties like `input.tool_input.command` without casts.
+ */
+type RelaxedToolInput<T> = Omit<T, "tool_input"> & { tool_input: Record<string, any> }
+
 export interface HookEventMap {
-	PreToolUse: PreToolUseHookInput
-	PostToolUse: PostToolUseHookInput
-	PostToolUseFailure: PostToolUseFailureHookInput
+	PreToolUse: RelaxedToolInput<PreToolUseHookInput>
+	PostToolUse: RelaxedToolInput<PostToolUseHookInput>
+	PostToolUseFailure: RelaxedToolInput<PostToolUseFailureHookInput>
 	Notification: NotificationHookInput
 	UserPromptSubmit: UserPromptSubmitHookInput
 	SessionStart: SessionStartHookInput
@@ -46,7 +52,7 @@ export interface HookEventMap {
 	SubagentStop: SubagentStopHookInput
 	PreCompact: PreCompactHookInput
 	PostCompact: PostCompactHookInput
-	PermissionRequest: PermissionRequestHookInput
+	PermissionRequest: RelaxedToolInput<PermissionRequestHookInput>
 	Setup: SetupHookInput
 	TeammateIdle: TeammateIdleHookInput
 	TaskCompleted: TaskCompletedHookInput

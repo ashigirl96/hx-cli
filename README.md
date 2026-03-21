@@ -32,22 +32,13 @@ This generates `.claude/hooks/dist/*.mjs` and merges hook entries into `.claude/
 Create a file in `.claude/extensions/<name>/index.ts`:
 
 ```typescript
-import { defineExtension } from "@dawkinsuke/hooks"
+import { defineExtension, deny } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	// Block dangerous Bash commands
-	cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {
-		const toolInput = input.tool_input as Record<string, unknown>
-		const command = toolInput?.command as string | undefined
-
-		if (command?.match(/rm\s+-rf\s+\//)) {
-			return {
-				hookSpecificOutput: {
-					hookEventName: "PreToolUse" as const,
-					permissionDecision: "deny" as const,
-					permissionDecisionReason: "Destructive command blocked",
-				},
-			}
+	cc.on("PreToolUse", "Bash", async (input) => {
+		if (input.tool_input.command?.match(/rm\s+-rf\s+\//)) {
+			return deny("Destructive command blocked")
 		}
 	})
 })
@@ -58,24 +49,16 @@ export default defineExtension((cc) => {
 `@dawkinsuke/hooks` supports four ways to register hooks:
 
 ```typescript
-import { defineExtension, HookBlockError } from "@dawkinsuke/hooks"
+import { defineExtension, HookBlockError, addContext } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
 	// ── cc.on() — Command hook (compiled to .mjs) ──
-	cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {
-		const toolInput = input.tool_input as Record<string, unknown>
-		const command = toolInput?.command as string | undefined
-
-		if (command?.includes("rm -rf /")) {
+	cc.on("PreToolUse", "Bash", async (input) => {
+		if (input.tool_input.command?.includes("rm -rf /")) {
 			throw new HookBlockError("Destructive command blocked")
 		}
 
-		return {
-			hookSpecificOutput: {
-				hookEventName: "PreToolUse" as const,
-				additionalContext: `Bash command: ${command}`,
-			},
-		}
+		return addContext(`Bash command: ${input.tool_input.command}`)
 	})
 
 	// ── cc.http() — Declarative HTTP webhook ──
@@ -108,54 +91,46 @@ export default defineExtension((cc) => {
 
 ## Key Concepts
 
-### `hookSpecificOutput`
+### Output Helpers
 
-Each event has its own output fields:
+Instead of constructing raw `hookSpecificOutput` objects, use helper functions:
+
+| Helper               | Effect                                 | Events                         |
+| -------------------- | -------------------------------------- | ------------------------------ |
+| `deny(reason?)`      | Block tool / deny permission           | PreToolUse, PermissionRequest  |
+| `allow(reason?)`     | Auto-approve tool / grant permission   | PreToolUse, PermissionRequest  |
+| `ask(reason?)`       | Prompt user for confirmation           | PreToolUse                     |
+| `addContext(text)`   | Inject text into Claude's conversation | Most events                    |
+| `modifyInput(input)` | Rewrite tool input                     | PreToolUse, PermissionRequest  |
+| `accept(content?)`   | Accept elicitation                     | Elicitation, ElicitationResult |
+| `decline()`          | Decline elicitation                    | Elicitation, ElicitationResult |
+| `cancel()`           | Cancel elicitation                     | Elicitation, ElicitationResult |
+
+Helpers are chainable for compound outputs:
 
 ```typescript
-// PreToolUse — control permissions and rewrite input
-{
-  hookSpecificOutput: {
-    hookEventName: "PreToolUse",
-    permissionDecision: "deny" | "allow" | "ask",
-    permissionDecisionReason: "...",
-    updatedInput: { command: "sanitized ..." },
-    additionalContext: "Injected into Claude's context",
-  }
-}
+// deny + inject context
+return deny("Dangerous").context("See docs for allowed commands")
 
-// PostToolUse — annotate results
-{
-  hookSpecificOutput: {
-    hookEventName: "PostToolUse",
-    additionalContext: "git push was executed. Check CI.",
-  }
-}
+// allow + rewrite input + inject context
+return allow().input({ command: "ls -la" }).context("Modified for safety")
 
-// PermissionRequest — programmatic allow/deny
-{
-  hookSpecificOutput: {
-    hookEventName: "PermissionRequest",
-    decision: { behavior: "deny", message: "Not allowed" },
-  }
-}
+// deny + interrupt session (PermissionRequest)
+return deny("Not allowed").interrupt()
 ```
 
-### `additionalContext`
-
-Return `additionalContext` in `hookSpecificOutput` to inject text into Claude's conversation as a system-reminder. Available on most events. Without `permissionDecision`, tool execution is not blocked.
+Raw `HookJSONOutput` objects are still accepted for backward compatibility.
 
 ### `HookBlockError`
 
-A concise way to block tool execution — throw instead of returning `hookSpecificOutput`:
+An alternative way to block tool execution — throw instead of returning `deny()`:
 
 ```typescript
 import { defineExtension, HookBlockError } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
-	cc.on("PreToolUse", { matcher: "Bash" }, async (input) => {
-		const toolInput = input.tool_input as Record<string, unknown>
-		if ((toolInput?.command as string)?.includes("DROP TABLE")) {
+	cc.on("PreToolUse", "Bash", async (input) => {
+		if (input.tool_input.command?.includes("DROP TABLE")) {
 			throw new HookBlockError("SQL DROP TABLE blocked")
 		}
 	})
@@ -164,11 +139,13 @@ export default defineExtension((cc) => {
 
 ### Matcher vs NoMatcher Events
 
-Most events support `{ matcher: "pattern" }` for conditional execution (regex on tool name, source, etc.):
+Most events support a matcher for conditional execution (regex on tool name, source, etc.).
+Pass it as a string or an options object:
 
 ```typescript
-cc.on("PreToolUse", { matcher: "Bash" }, async (input) => { ... })
-cc.on("SessionStart", { matcher: "startup" }, async (input) => { ... })
+cc.on("PreToolUse", "Bash", async (input) => { ... })               // string shorthand
+cc.on("PreToolUse", { matcher: "Bash", timeout: 30 }, async (input) => { ... })  // options object
+cc.on("SessionStart", "startup", async (input) => { ... })
 ```
 
 **NoMatcherEvents** always fire — the matcher option is not available:
@@ -199,24 +176,24 @@ Options:
 
 See [`examples/`](./examples/) for 16 copy-ready extensions covering every hook pattern:
 
-| #   | Example              | Pattern                                                      |
-| --- | -------------------- | ------------------------------------------------------------ |
-| 01  | `deny-command`       | PreToolUse — block with `permissionDecision: "deny"`         |
-| 02  | `additional-context` | PreToolUse — inject context with `additionalContext`         |
-| 03  | `allow-command`      | PreToolUse — auto-approve with `permissionDecision: "allow"` |
-| 04  | `updated-input`      | PreToolUse — rewrite input with `updatedInput`               |
-| 05  | `post-tool-use`      | PostToolUse — annotate after execution                       |
-| 06  | `user-prompt-submit` | UserPromptSubmit — NoMatcherEvent                            |
-| 07  | `session-start`      | SessionStart — inject project info                           |
-| 08  | `notification`       | Notification — handle notifications                          |
-| 09  | `permission-request` | PermissionRequest — programmatic allow/deny                  |
-| 10  | `hook-block-error`   | HookBlockError — block via throw                             |
-| 11  | `stop`               | Stop — override stop behavior                                |
-| 12  | `elicitation`        | Elicitation — handle MCP elicitations                        |
-| 13  | `http-hook`          | `cc.http()` — declarative HTTP webhook                       |
-| 14  | `prompt-hook`        | `cc.prompt()` — LLM single-turn evaluation                   |
-| 15  | `agent-hook`         | `cc.agent()` — LLM multi-turn verification                   |
-| 16  | `mixed`              | All hook types in one extension                              |
+| #   | Example              | Pattern                                    |
+| --- | -------------------- | ------------------------------------------ |
+| 01  | `deny-command`       | PreToolUse — block with `deny()`           |
+| 02  | `additional-context` | PreToolUse — inject with `addContext()`    |
+| 03  | `allow-command`      | PreToolUse — auto-approve with `allow()`   |
+| 04  | `updated-input`      | PreToolUse — rewrite with `modifyInput()`  |
+| 05  | `post-tool-use`      | PostToolUse — annotate with `addContext()` |
+| 06  | `user-prompt-submit` | UserPromptSubmit — NoMatcherEvent          |
+| 07  | `session-start`      | SessionStart — inject project info         |
+| 08  | `notification`       | Notification — handle notifications        |
+| 09  | `permission-request` | PermissionRequest — `deny()` / `allow()`   |
+| 10  | `hook-block-error`   | HookBlockError — block via throw           |
+| 11  | `stop`               | Stop — override stop behavior              |
+| 12  | `elicitation`        | Elicitation — `accept()` / `decline()`     |
+| 13  | `http-hook`          | `cc.http()` — declarative HTTP webhook     |
+| 14  | `prompt-hook`        | `cc.prompt()` — LLM single-turn evaluation |
+| 15  | `agent-hook`         | `cc.agent()` — LLM multi-turn verification |
+| 16  | `mixed`              | All hook types in one extension            |
 
 Copy any example into your project:
 

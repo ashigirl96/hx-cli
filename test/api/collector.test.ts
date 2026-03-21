@@ -90,6 +90,36 @@ describe("collector", () => {
 		}).toThrow("agent hooks are only supported on PreToolUse, PostToolUse, and PermissionRequest")
 	})
 
+	test("captures on() with string matcher shorthand", () => {
+		const { api, result } = createCollector("test-ext", "/path/to/ext")
+
+		api.on("PreToolUse", "Bash", async () => ({}))
+
+		expect(result.registrations).toHaveLength(1)
+		expect(result.registrations[0]).toEqual({
+			type: "command",
+			event: "PreToolUse",
+			matcher: "Bash",
+			timeout: undefined,
+		})
+	})
+
+	test("string matcher produces same registration as object matcher", () => {
+		const { api: api1, result: result1 } = createCollector("ext1", "/path/to/ext1")
+		const { api: api2, result: result2 } = createCollector("ext2", "/path/to/ext2")
+
+		api1.on("PreToolUse", "Bash", async () => ({}))
+		api2.on("PreToolUse", { matcher: "Bash" }, async () => ({}))
+
+		expect(result1.registrations[0]!.type).toBe(result2.registrations[0]!.type)
+		if (
+			result1.registrations[0]!.type === "command" &&
+			result2.registrations[0]!.type === "command"
+		) {
+			expect(result1.registrations[0]!.matcher).toBe(result2.registrations[0]!.matcher)
+		}
+	})
+
 	test("captures multiple registrations", () => {
 		const { api, result } = createCollector("test-ext", "/path/to/ext")
 
