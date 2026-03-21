@@ -163,14 +163,22 @@ hx build              Build all enabled extensions
 hx init               Create .claude/extensions/ with a sample extension
 hx new <name>         Scaffold a new extension
 hx list               List all extensions and their status
-hx enable <name>      Enable an extension and rebuild
-hx disable <name>     Disable an extension and rebuild
+hx activate           Toggle extensions on/off (interactive)
+hx update             Update hx to the latest version
 hx clean              Remove all hx artifacts
+hx completions        Generate shell completion scripts
 ```
 
 Options:
 
 - `--runtime, -r` — Runtime for hooks: `"bun"` or `"node"` (auto-detected)
+- `--latest` — Install from GitHub main branch (bleeding edge, for `hx update`)
+
+### Shell Completions
+
+```bash
+hx completions zsh > ~/.zsh/completions/_hx
+```
 
 ## Examples
 

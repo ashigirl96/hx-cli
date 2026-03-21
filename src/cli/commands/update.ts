@@ -1,21 +1,30 @@
-/**
- * hx update — Update hx CLI to the latest version.
- *
- * --latest  Install from GitHub main branch (bleeding edge)
- */
-export async function updateCommand(latest: boolean): Promise<void> {
-	const target = latest ? "github:ashigirl96/hx-cli#main" : "@dawkinsuke/hooks@latest"
+import { defineCommand, option } from "@bunli/core"
+import { z } from "zod"
 
-	console.log(
-		latest ? "Updating hx from GitHub main branch..." : "Updating hx to latest npm release...",
-	)
+export default defineCommand({
+	name: "update",
+	description: "Update hx to the latest version",
+	options: {
+		latest: option(z.coerce.boolean().default(false), {
+			description: "Install from GitHub main branch (bleeding edge)",
+		}),
+	},
+	handler: async ({ flags }) => {
+		const target = flags.latest ? "github:ashigirl96/hx-cli#main" : "@dawkinsuke/hooks@latest"
 
-	const result = await Bun.$`bun add -g ${target}`.quiet()
+		console.log(
+			flags.latest
+				? "Updating hx from GitHub main branch..."
+				: "Updating hx to latest npm release...",
+		)
 
-	if (result.exitCode !== 0) {
-		console.error("Update failed:", result.stderr.toString())
-		process.exit(1)
-	}
+		const result = await Bun.$`bun add -g ${target}`.quiet()
 
-	console.log("Updated successfully!")
-}
+		if (result.exitCode !== 0) {
+			console.error("Update failed:", result.stderr.toString())
+			process.exit(1)
+		}
+
+		console.log("Updated successfully!")
+	},
+})
