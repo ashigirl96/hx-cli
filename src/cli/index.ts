@@ -10,6 +10,7 @@ import { enableCommand } from "./commands/enable.js"
 import { initCommand } from "./commands/init.js"
 import { listCommand } from "./commands/list.js"
 import { newCommand } from "./commands/new.js"
+import { updateCommand } from "./commands/update.js"
 
 const { positionals, values } = parseArgs({
 	args: Bun.argv.slice(2),
@@ -18,6 +19,7 @@ const { positionals, values } = parseArgs({
 	options: {
 		runtime: { type: "string", short: "r" },
 		help: { type: "boolean", short: "h" },
+		latest: { type: "boolean" },
 	},
 })
 
@@ -35,10 +37,12 @@ Commands:
   list               List all extensions and their status
   enable <name>      Enable an extension and rebuild
   disable <name>     Disable an extension and rebuild
+  update             Update hx to the latest version
   clean              Remove all hx artifacts from settings and hooks/
 
 Options:
   --runtime, -r      Runtime for hooks: "bun" or "node" (auto-detected)
+  --latest           Install from GitHub main branch (bleeding edge)
   --help, -h         Show this help
 `)
 	process.exit(0)
@@ -64,6 +68,9 @@ switch (command) {
 		break
 	case "disable":
 		await disableCommand(positionals[1], runtimeOpt)
+		break
+	case "update":
+		await updateCommand(!!values.latest)
 		break
 	case "clean":
 		await cleanCommand()
