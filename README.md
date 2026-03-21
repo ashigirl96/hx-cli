@@ -213,6 +213,38 @@ cp -r examples/01-deny-command .claude/extensions/deny-command
 hx build
 ```
 
+## Claude Code Plugin: hook-creator
+
+This repository is also a Claude Code plugin. It ships with a skill that lets Claude create hooks for you in natural language.
+
+### Install the Plugin
+
+```bash
+# 1. Add the marketplace
+/plugin marketplace add ashigirl96/hx-cli
+
+# 2. Install the plugin
+/plugin install hook-creator@dawkinsuke-hx-cli
+
+```
+
+### Usage
+
+Once installed, just ask Claude in natural language:
+
+```
+> Create a hook that blocks git push
+> Create a hook that runs tests before every git commit
+> Create a hook that injects project info at session start
+```
+
+Claude will:
+
+1. Choose the right event and output helper
+2. Scaffold the extension with `hx new`
+3. Write the TypeScript implementation
+4. Run `hx build` to compile
+
 ## How It Works
 
 ```

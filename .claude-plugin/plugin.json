@@ -1,0 +1,12 @@
+{
+	"name": "hook-creator",
+	"description": "Create Claude Code hooks using hx-cli and the @dawkinsuke/hooks TypeScript API. Ask Claude to create hooks in natural language.",
+	"version": "0.1.0",
+	"author": {
+		"name": "ashigirl96",
+		"url": "https://github.com/ashigirl96"
+	},
+	"repository": "https://github.com/ashigirl96/hx-cli",
+	"license": "MIT",
+	"keywords": ["hooks", "claude-code", "hx-cli", "typescript", "extensions"]
+}

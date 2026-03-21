@@ -1,0 +1,17 @@
+{
+	"name": "dawkinsuke-hx-cli",
+	"owner": {
+		"name": "ashigirl96"
+	},
+	"metadata": {
+		"description": "Claude Code hooks toolkit — skills for creating hooks with @dawkinsuke/hooks"
+	},
+	"plugins": [
+		{
+			"name": "hook-creator",
+			"source": "./",
+			"description": "Create Claude Code hooks using hx-cli and the @dawkinsuke/hooks TypeScript API. Ask Claude to create hooks in natural language.",
+			"version": "0.1.0"
+		}
+	]
+}
