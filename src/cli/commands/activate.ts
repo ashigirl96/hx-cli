@@ -1,7 +1,6 @@
-import { defineCommand, option } from "@bunli/core"
+import { defineCommand } from "@bunli/core"
 import { isCancel, multiselect } from "@clack/prompts"
 import * as path from "node:path"
-import { z } from "zod"
 import { buildExtensions } from "../../build/builder.js"
 import { discoverExtensions } from "../../build/discover.js"
 import { readManifest, writeManifest } from "../../settings/manifest.js"
@@ -9,13 +8,7 @@ import { readManifest, writeManifest } from "../../settings/manifest.js"
 export default defineCommand({
 	name: "activate",
 	description: "Toggle extensions on/off and rebuild",
-	options: {
-		runtime: option(z.string().optional(), {
-			description: 'Runtime for hooks: "bun" or "node" (auto-detected)',
-			short: "r",
-		}),
-	},
-	handler: async ({ flags }) => {
+	handler: async () => {
 		const cwd = process.cwd()
 		const extensionsDir = path.join(cwd, ".claude", "extensions")
 		const extensions = discoverExtensions(extensionsDir)
@@ -73,7 +66,7 @@ export default defineCommand({
 
 		writeManifest(cwd, manifest)
 		console.log("Rebuilding...")
-		await buildExtensions(cwd, flags.runtime)
+		await buildExtensions(cwd)
 		console.log("Done.")
 	},
 })

@@ -6,6 +6,10 @@ Claude Code hooks toolkit — write hooks in TypeScript, compile to `settings.lo
 Write TypeScript extensions → hx build → hooks & settings ready
 ```
 
+## Prerequisites
+
+- [Bun](https://bun.sh/) v1.0.0 or later
+
 ## Install
 
 ```bash
@@ -84,7 +88,7 @@ export default defineExtension((cc) => {
 
 | Type    | Method        | Compiled | Use Case                                                               |
 | ------- | ------------- | -------- | ---------------------------------------------------------------------- |
-| Command | `cc.on()`     | `.mjs`   | Programmatic logic with full Node.js/Bun access                        |
+| Command | `cc.on()`     | `.mjs`   | Programmatic logic with full Bun access                                |
 | HTTP    | `cc.http()`   | No       | Forward events to an external webhook                                  |
 | Prompt  | `cc.prompt()` | No       | LLM single-turn evaluation (PreToolUse/PostToolUse/PermissionRequest)  |
 | Agent   | `cc.agent()`  | No       | LLM multi-turn verification (PreToolUse/PostToolUse/PermissionRequest) |
@@ -171,7 +175,6 @@ hx completions        Generate shell completion scripts
 
 Options:
 
-- `--runtime, -r` — Runtime for hooks: `"bun"` or `"node"` (auto-detected)
 - `--latest` — Install from GitHub main branch (bleeding edge, for `hx update`)
 
 ### Shell Completions

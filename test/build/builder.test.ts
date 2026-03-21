@@ -32,7 +32,7 @@ describe("builder", () => {
 			`,
 		)
 
-		const result = await buildExtensions(tmpDir, "bun")
+		const result = await buildExtensions(tmpDir)
 
 		expect(result.extensions).toHaveLength(1)
 		expect(result.hookCount).toBe(1)
@@ -64,7 +64,7 @@ describe("builder", () => {
 			`,
 		)
 
-		const result = await buildExtensions(tmpDir, "bun")
+		const result = await buildExtensions(tmpDir)
 
 		expect(result.hookCount).toBe(3)
 
@@ -101,7 +101,7 @@ describe("builder", () => {
 			`,
 		)
 
-		const result = await buildExtensions(tmpDir, "bun")
+		const result = await buildExtensions(tmpDir)
 
 		expect(result.hookCount).toBe(3)
 		expect(result.extensions[0]!.registrations).toHaveLength(3)
@@ -118,7 +118,7 @@ describe("builder", () => {
 			`,
 		)
 
-		const result = await buildExtensions(tmpDir, "bun")
+		const result = await buildExtensions(tmpDir)
 
 		// Two handlers for same (event, matcher) = 1 bundle, 1 settings entry
 		expect(result.hookCount).toBe(1)
@@ -130,7 +130,7 @@ describe("builder", () => {
 	})
 
 	test("returns no results when no extensions exist", async () => {
-		const result = await buildExtensions(tmpDir, "bun")
+		const result = await buildExtensions(tmpDir)
 
 		expect(result.extensions).toHaveLength(0)
 		expect(result.hookCount).toBe(0)
@@ -140,7 +140,7 @@ describe("builder", () => {
 	test("reports errors for invalid extensions", async () => {
 		writeExtension("bad", `export default "not a function";`)
 
-		const result = await buildExtensions(tmpDir, "bun")
+		const result = await buildExtensions(tmpDir)
 
 		expect(result.errors).toHaveLength(1)
 		expect(result.errors[0]!.extension).toBe("bad")
@@ -164,7 +164,7 @@ describe("builder", () => {
 		)
 
 		// No extensions in directory → build should strip stale entries
-		const result = await buildExtensions(tmpDir, "bun")
+		const result = await buildExtensions(tmpDir)
 
 		expect(result.extensions).toHaveLength(0)
 		const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"))
@@ -191,7 +191,7 @@ describe("builder", () => {
 		// Extension that fails to load
 		writeExtension("bad", `export default "not a function";`)
 
-		const result = await buildExtensions(tmpDir, "bun")
+		const result = await buildExtensions(tmpDir)
 
 		expect(result.errors).toHaveLength(1)
 		const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"))
@@ -202,12 +202,12 @@ describe("builder", () => {
 	test("uses $CLAUDE_PROJECT_DIR in generated commands with CLI args", async () => {
 		writeExtension("path-test", `export default (cc) => { cc.on("Stop", async () => ({})); };`)
 
-		await buildExtensions(tmpDir, "node")
+		await buildExtensions(tmpDir)
 
 		const settingsPath = path.join(tmpDir, ".claude", "settings.local.json")
 		const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"))
 		const command = settings.hooks.Stop[0].hooks[0].command as string
-		expect(command).toMatch(/^node "\$CLAUDE_PROJECT_DIR\/.*\.mjs" Stop/)
-		expect(command).toStartWith("node ")
+		expect(command).toMatch(/^bun "\$CLAUDE_PROJECT_DIR\/.*\.mjs" Stop/)
+		expect(command).toStartWith("bun ")
 	})
 })

@@ -1,21 +1,14 @@
-import { defineCommand, option } from "@bunli/core"
-import { z } from "zod"
+import { defineCommand } from "@bunli/core"
 import { buildExtensions } from "../../build/builder.js"
 
 export default defineCommand({
 	name: "build",
 	description: "Build all enabled extensions into .claude/hooks/",
-	options: {
-		runtime: option(z.string().optional(), {
-			description: 'Runtime for hooks: "bun" or "node" (auto-detected)',
-			short: "r",
-		}),
-	},
-	handler: async ({ flags }) => {
+	handler: async () => {
 		const cwd = process.cwd()
 		console.log("Building extensions...\n")
 
-		const result = await buildExtensions(cwd, flags.runtime)
+		const result = await buildExtensions(cwd)
 
 		if (result.errors.length > 0) {
 			for (const err of result.errors) {
