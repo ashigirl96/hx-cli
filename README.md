@@ -16,69 +16,64 @@ Write TypeScript extensions → hx build → hooks & settings ready
 bun install -g @dawkinsuke/hooks
 ```
 
-## Quick Start
+Optionally, install the Claude Code plugin so Claude can create hooks for you in natural language:
 
 ```bash
-# Scaffold a new project with a sample extension
-hx init
-
-# Or create a new extension in an existing project
-hx new my-guard
-
-# Build all extensions
-hx build
+# In Claude Code
+/plugin marketplace add ashigirl96/hx-cli
+/plugin install hook-creator@dawkinsuke-hx-cli
 ```
 
-This generates `.claude/hooks/<name>.mjs` and merges hook entries into `.claude/settings.local.json`.
+## Quick Start
+
+### Option A: Scaffold manually
+
+```bash
+hx init        # creates .claude/extensions/guard/index.ts
+hx build       # compiles to .claude/hooks/ and updates settings.local.json
+```
+
+### Option B: Let Claude create hooks for you
+
+With the plugin installed, just ask in natural language:
+
+```
+> Create a hook that blocks git push
+> Create a hook that runs tests before every git commit
+> Create a hook that injects project info at session start
+```
+
+Claude will scaffold the extension, write the TypeScript, and run `hx build`.
 
 ## Writing Extensions
 
-Create a file in `.claude/extensions/<name>/index.ts`:
+Create `.claude/extensions/<name>/index.ts` (or use `hx new <name>` to scaffold):
 
 ```typescript
-import { defineExtension, deny } from "@dawkinsuke/hooks"
+import { defineExtension, deny, addContext } from "@dawkinsuke/hooks"
 
 export default defineExtension((cc) => {
-	// Block dangerous Bash commands
+	// Command hook — compiled to .mjs, full Bun runtime access
 	cc.on("PreToolUse", "Bash", async (input) => {
 		if (input.tool_input.command?.match(/rm\s+-rf\s+\//)) {
 			return deny("Destructive command blocked")
 		}
 	})
-})
-```
 
-## Four Hook Types
-
-`@dawkinsuke/hooks` supports four ways to register hooks:
-
-```typescript
-import { defineExtension, HookBlockError, addContext } from "@dawkinsuke/hooks"
-
-export default defineExtension((cc) => {
-	// ── cc.on() — Command hook (compiled to .mjs) ──
-	cc.on("PreToolUse", "Bash", async (input) => {
-		if (input.tool_input.command?.includes("rm -rf /")) {
-			throw new HookBlockError("Destructive command blocked")
-		}
-
-		return addContext(`Bash command: ${input.tool_input.command}`)
-	})
-
-	// ── cc.http() — Declarative HTTP webhook ──
+	// HTTP hook — POST to a URL on events (declarative, not compiled)
 	cc.http("PostToolUse", {
 		matcher: "Bash",
 		url: "http://localhost:8080/audit",
 		timeout: 5,
 	})
 
-	// ── cc.prompt() — Single-turn LLM evaluation ──
+	// Prompt hook — single-turn LLM evaluation (declarative)
 	cc.prompt("PreToolUse", {
 		matcher: "Edit",
 		prompt: "Ensure the edit does not introduce security vulnerabilities.",
 	})
 
-	// ── cc.agent() — Multi-turn LLM verification ──
+	// Agent hook — multi-turn LLM verification (declarative)
 	cc.agent("PostToolUse", {
 		matcher: "Write",
 		prompt: "Verify the file is syntactically correct.",
@@ -93,11 +88,7 @@ export default defineExtension((cc) => {
 | Prompt  | `cc.prompt()` | No       | LLM single-turn evaluation (PreToolUse/PostToolUse/PermissionRequest)  |
 | Agent   | `cc.agent()`  | No       | LLM multi-turn verification (PreToolUse/PostToolUse/PermissionRequest) |
 
-## Key Concepts
-
-### Output Helpers
-
-Instead of constructing raw `hookSpecificOutput` objects, use helper functions:
+## Output Helpers
 
 | Helper               | Effect                                 | Events                         |
 | -------------------- | -------------------------------------- | ------------------------------ |
@@ -110,55 +101,17 @@ Instead of constructing raw `hookSpecificOutput` objects, use helper functions:
 | `decline()`          | Decline elicitation                    | Elicitation, ElicitationResult |
 | `cancel()`           | Cancel elicitation                     | Elicitation, ElicitationResult |
 
-Helpers are chainable for compound outputs:
+Helpers are chainable:
 
 ```typescript
-// deny + inject context
-return deny("Dangerous").context("See docs for allowed commands")
-
-// allow + rewrite input + inject context
-return allow().input({ command: "ls -la" }).context("Modified for safety")
-
-// deny + interrupt session (PermissionRequest)
-return deny("Not allowed").interrupt()
+deny("Dangerous").context("See docs for allowed commands")
+allow().input({ command: "ls -la" }).context("Modified for safety")
+addContext("warning").visible() // macOS notification
 ```
 
-Raw `HookJSONOutput` objects are still accepted for backward compatibility.
+## Examples
 
-### `HookBlockError`
-
-An alternative way to block tool execution — throw instead of returning `deny()`:
-
-```typescript
-import { defineExtension, HookBlockError } from "@dawkinsuke/hooks"
-
-export default defineExtension((cc) => {
-	cc.on("PreToolUse", "Bash", async (input) => {
-		if (input.tool_input.command?.includes("DROP TABLE")) {
-			throw new HookBlockError("SQL DROP TABLE blocked")
-		}
-	})
-})
-```
-
-### Matcher vs NoMatcher Events
-
-Most events support a matcher for conditional execution (regex on tool name, source, etc.).
-Pass it as a string or an options object:
-
-```typescript
-cc.on("PreToolUse", "Bash", async (input) => { ... })               // string shorthand
-cc.on("PreToolUse", { matcher: "Bash", timeout: 30 }, async (input) => { ... })  // options object
-cc.on("SessionStart", "startup", async (input) => { ... })
-```
-
-**NoMatcherEvents** always fire — the matcher option is not available:
-`UserPromptSubmit`, `Stop`, `TeammateIdle`, `TaskCompleted`, `WorktreeCreate`, `WorktreeRemove`
-
-```typescript
-cc.on("UserPromptSubmit", async (input) => { ... })
-cc.on("Stop", async (input) => { ... })
-```
+See [`examples/`](./examples/) for 16 copy-ready extensions covering every hook pattern.
 
 ## CLI
 
@@ -173,78 +126,6 @@ hx clean              Remove all hx artifacts
 hx completions        Generate shell completion scripts
 ```
 
-Options:
-
-- `--latest` — Install from GitHub main branch (bleeding edge, for `hx update`)
-
-### Shell Completions
-
-```bash
-hx completions zsh > ~/.zsh/completions/_hx
-```
-
-## Examples
-
-See [`examples/`](./examples/) for 16 copy-ready extensions covering every hook pattern:
-
-| #   | Example              | Pattern                                    |
-| --- | -------------------- | ------------------------------------------ |
-| 01  | `deny-command`       | PreToolUse — block with `deny()`           |
-| 02  | `additional-context` | PreToolUse — inject with `addContext()`    |
-| 03  | `allow-command`      | PreToolUse — auto-approve with `allow()`   |
-| 04  | `updated-input`      | PreToolUse — rewrite with `modifyInput()`  |
-| 05  | `post-tool-use`      | PostToolUse — annotate with `addContext()` |
-| 06  | `user-prompt-submit` | UserPromptSubmit — NoMatcherEvent          |
-| 07  | `session-start`      | SessionStart — inject project info         |
-| 08  | `notification`       | Notification — handle notifications        |
-| 09  | `permission-request` | PermissionRequest — `deny()` / `allow()`   |
-| 10  | `hook-block-error`   | HookBlockError — block via throw           |
-| 11  | `stop`               | Stop — override stop behavior              |
-| 12  | `elicitation`        | Elicitation — `accept()` / `decline()`     |
-| 13  | `http-hook`          | `cc.http()` — declarative HTTP webhook     |
-| 14  | `prompt-hook`        | `cc.prompt()` — LLM single-turn evaluation |
-| 15  | `agent-hook`         | `cc.agent()` — LLM multi-turn verification |
-| 16  | `mixed`              | All hook types in one extension            |
-
-Copy any example into your project:
-
-```bash
-cp -r examples/01-deny-command .claude/extensions/deny-command
-hx build
-```
-
-## Claude Code Plugin: hook-creator
-
-This repository is also a Claude Code plugin. It ships with a skill that lets Claude create hooks for you in natural language.
-
-### Install the Plugin
-
-```bash
-# 1. Add the marketplace
-/plugin marketplace add ashigirl96/hx-cli
-
-# 2. Install the plugin
-/plugin install hook-creator@dawkinsuke-hx-cli
-
-```
-
-### Usage
-
-Once installed, just ask Claude in natural language:
-
-```
-> Create a hook that blocks git push
-> Create a hook that runs tests before every git commit
-> Create a hook that injects project info at session start
-```
-
-Claude will:
-
-1. Choose the right event and output helper
-2. Scaffold the extension with `hx new`
-3. Write the TypeScript implementation
-4. Run `hx build` to compile
-
 ## How It Works
 
 ```
@@ -258,18 +139,12 @@ Hooks fire on tool use, prompts, sessions, etc.
 
 1. **Discover** — Find all `.ts` files in `.claude/extensions/`
 2. **Collect** — Execute the factory to record hook registrations
-3. **Bundle** — Compile to a single `.mjs` per extension via Bun.build (in-memory, no intermediate files)
+3. **Bundle** — Compile to a single `.mjs` per extension via Bun.build
 4. **Merge** — Write hook entries into `settings.local.json` (hx-managed hooks are tagged and never touch user hooks)
-
-Each settings entry invokes the same `.mjs` with event/matcher as CLI args:
-
-```
-bun .claude/hooks/my-ext.mjs PreToolUse Bash
-```
 
 ## Acknowledgments
 
-This project was inspired by [pi-mono](https://github.com/badlogic/pi-mono) by Mario Zechner — particularly the coding-agent extension system. The TypeScript-first, event-driven hook architecture in hx-cli is built with great respect for pi's design.
+This project was inspired by [pi-mono](https://github.com/badlogic/pi-mono) by Mario Zechner — particularly the coding-agent extension system.
 
 ## License
 
