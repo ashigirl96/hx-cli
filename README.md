@@ -26,24 +26,60 @@ Optionally, install the Claude Code plugin so Claude can create hooks for you in
 
 ## Quick Start
 
-### Option A: Scaffold manually
-
 ```bash
-hx init        # creates .claude/extensions/guard/index.ts
+hx init        # creates .claude/extensions/guard/index.ts with a sample hook
 hx build       # compiles to .claude/hooks/ and updates settings.local.json
 ```
 
-### Option B: Let Claude create hooks for you
-
-With the plugin installed, just ask in natural language:
+With the plugin installed, ask Claude to create hooks for you:
 
 ```
-> Create a hook that blocks git push
-> Create a hook that runs tests before every git commit
-> Create a hook that injects project info at session start
+> /hook-creator:hook-creator Create a hook that blocks git push
 ```
 
-Claude will scaffold the extension, write the TypeScript, and run `hx build`.
+Creates `.claude/extensions/block-push/index.ts`:
+
+```typescript
+import { defineExtension, deny } from "@dawkinsuke/hooks"
+
+export default defineExtension((cc) => {
+	cc.on("PreToolUse", "Bash", async (input) => {
+		if (input.tool_input.command && /git\s+push/.test(input.tool_input.command)) {
+			return deny("git push is blocked by hook policy")
+		}
+	})
+})
+```
+
+```
+> /hook-creator:hook-creator Create a hook that runs bun test before git commit when src/ files are staged
+```
+
+Creates `.claude/extensions/auto-test/index.ts`:
+
+```typescript
+import { execSync } from "node:child_process"
+import { defineExtension, modifyInput } from "@dawkinsuke/hooks"
+
+export default defineExtension((cc) => {
+	cc.on("PreToolUse", "Bash", async (input) => {
+		const command = input.tool_input.command as string | undefined
+		if (!command || !/git\s+commit/.test(command)) return
+
+		const staged = execSync("git diff --cached --name-only", { encoding: "utf-8" })
+		const hasSrcChanges = staged
+			.split("\n")
+			.filter(Boolean)
+			.some((f) => f.startsWith("src/"))
+
+		if (hasSrcChanges) {
+			return modifyInput({ ...input.tool_input, command: `bun test && ${command}` })
+		}
+	})
+})
+```
+
+Then run `hx build` to compile and activate.
 
 ## Writing Extensions
 
