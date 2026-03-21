@@ -11,14 +11,6 @@ import { discoverExtensions } from "./discover.js"
 import { ensureHxResolvable } from "./resolve-plugin.js"
 
 // ---------------------------------------------------------------------------
-// Detect runtime (bun or node)
-// ---------------------------------------------------------------------------
-
-function detectRuntime(): string {
-	return typeof Bun !== "undefined" ? "bun" : "node"
-}
-
-// ---------------------------------------------------------------------------
 // Group command registrations by (event, matcher)
 // ---------------------------------------------------------------------------
 
@@ -66,13 +58,9 @@ export interface BuildResult {
 // buildExtensions
 // ---------------------------------------------------------------------------
 
-export async function buildExtensions(
-	projectRoot: string,
-	runtimeOverride?: string,
-): Promise<BuildResult> {
+export async function buildExtensions(projectRoot: string): Promise<BuildResult> {
 	const extensionsDir = path.join(projectRoot, ".claude", "extensions")
 	const hooksDir = path.join(projectRoot, ".claude", "hooks")
-	const runtime = runtimeOverride ?? detectRuntime()
 
 	// 1. Discover extensions
 	const extensions = discoverExtensions(extensionsDir)
@@ -156,7 +144,7 @@ export async function buildExtensions(
 			const relPath = path.relative(projectRoot, path.join(hooksDir, outName))
 			for (const group of groups) {
 				const matcherArg = group.matcher !== undefined ? ` ${group.matcher}` : ""
-				const command = `${runtime} "$CLAUDE_PROJECT_DIR/${relPath}" ${group.event}${matcherArg} # hx-managed:${ext.name}:${group.event}:${group.matcher ?? ""}`
+				const command = `bun "$CLAUDE_PROJECT_DIR/${relPath}" ${group.event}${matcherArg} # hx-managed:${ext.name}:${group.event}:${group.matcher ?? ""}`
 
 				addSettingsEntry(allSettings, group.event, group.matcher, {
 					type: "command",
