@@ -38,15 +38,8 @@ describe("builder", () => {
 		expect(result.hookCount).toBe(1)
 		expect(result.errors).toHaveLength(0)
 
-		// Check .mjs was generated
-		const mjsPath = path.join(
-			tmpDir,
-			".claude",
-			"hooks",
-			"dist",
-			"test-ext",
-			"PreToolUse__Bash.mjs",
-		)
+		// Check .mjs was generated at .claude/hooks/<name>.mjs
+		const mjsPath = path.join(tmpDir, ".claude", "hooks", "test-ext.mjs")
 		expect(fs.existsSync(mjsPath)).toBe(true)
 
 		// Check settings.local.json was created
@@ -59,7 +52,7 @@ describe("builder", () => {
 		expect(settings.hooks.PreToolUse[0].hooks[0].command).toContain("hx-managed:")
 	})
 
-	test("handles multiple events and matchers", async () => {
+	test("handles multiple events and matchers with a single .mjs", async () => {
 		writeExtension(
 			"multi",
 			`
@@ -75,11 +68,25 @@ describe("builder", () => {
 
 		expect(result.hookCount).toBe(3)
 
-		// Should generate 3 separate .mjs files
-		const distDir = path.join(tmpDir, ".claude", "hooks", "dist", "multi")
-		expect(fs.existsSync(path.join(distDir, "PreToolUse__Bash.mjs"))).toBe(true)
-		expect(fs.existsSync(path.join(distDir, "PreToolUse__Edit.mjs"))).toBe(true)
-		expect(fs.existsSync(path.join(distDir, "Stop.mjs"))).toBe(true)
+		// Should generate a single .mjs file for the extension
+		const mjsPath = path.join(tmpDir, ".claude", "hooks", "multi.mjs")
+		expect(fs.existsSync(mjsPath)).toBe(true)
+
+		// All settings entries should point to the same .mjs with different CLI args
+		const settingsPath = path.join(tmpDir, ".claude", "settings.local.json")
+		const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"))
+		const bashCmd = settings.hooks.PreToolUse.find((g: any) => g.matcher === "Bash").hooks[0]
+			.command
+		const editCmd = settings.hooks.PreToolUse.find((g: any) => g.matcher === "Edit").hooks[0]
+			.command
+		const stopCmd = settings.hooks.Stop[0].hooks[0].command
+
+		expect(bashCmd).toContain("multi.mjs")
+		expect(bashCmd).toContain("PreToolUse Bash")
+		expect(editCmd).toContain("multi.mjs")
+		expect(editCmd).toContain("PreToolUse Edit")
+		expect(stopCmd).toContain("multi.mjs")
+		expect(stopCmd).toContain("Stop")
 	})
 
 	test("handles mixed hook types", async () => {
@@ -192,7 +199,7 @@ describe("builder", () => {
 		expect(settings.hooks?.Stop).toBeUndefined()
 	})
 
-	test("uses $CLAUDE_PROJECT_DIR in generated commands", async () => {
+	test("uses $CLAUDE_PROJECT_DIR in generated commands with CLI args", async () => {
 		writeExtension("path-test", `export default (cc) => { cc.on("Stop", async () => ({})); };`)
 
 		await buildExtensions(tmpDir, "node")
@@ -200,9 +207,7 @@ describe("builder", () => {
 		const settingsPath = path.join(tmpDir, ".claude", "settings.local.json")
 		const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"))
 		const command = settings.hooks.Stop[0].hooks[0].command as string
-		expect(command).toMatch(/^node "\$CLAUDE_PROJECT_DIR\/.*"/)
-		// Ensure the entire path is quoted, not just $CLAUDE_PROJECT_DIR
-		expect(command).not.toContain('"$CLAUDE_PROJECT_DIR"/')
+		expect(command).toMatch(/^node "\$CLAUDE_PROJECT_DIR\/.*\.mjs" Stop/)
 		expect(command).toStartWith("node ")
 	})
 })

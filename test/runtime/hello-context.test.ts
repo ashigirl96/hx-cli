@@ -46,10 +46,10 @@ describe("hello-context extension runtime", () => {
 		expect(result.hookCount).toBe(1)
 
 		// Find the generated .mjs
-		const mjsPath = path.join(tmpDir, ".claude", "hooks", "dist", "hello-context", "PreToolUse.mjs")
+		const mjsPath = path.join(tmpDir, ".claude", "hooks", "hello-context.mjs")
 		expect(fs.existsSync(mjsPath)).toBe(true)
 
-		// Execute the hook with simulated stdin
+		// Execute the hook with simulated stdin (pass event via CLI args)
 		const stdinPayload = JSON.stringify({
 			hook_event_name: "PreToolUse",
 			tool_name: "Bash",
@@ -59,7 +59,7 @@ describe("hello-context extension runtime", () => {
 			cwd: tmpDir,
 		})
 
-		const proc = Bun.spawn(["bun", mjsPath], {
+		const proc = Bun.spawn(["bun", mjsPath, "PreToolUse"], {
 			stdin: new Blob([stdinPayload]),
 			stdout: "pipe",
 			stderr: "pipe",

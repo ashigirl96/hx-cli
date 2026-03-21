@@ -9,15 +9,16 @@ export async function cleanCommand(): Promise<void> {
 	await cleanSettings(cwd)
 	console.log("Cleaned hooks from .claude/settings.local.json")
 
-	// Remove build artifacts
-	const distDir = path.join(cwd, ".claude", "hooks", "dist")
-	const srcDir = path.join(cwd, ".claude", "hooks", "src")
-	const manifestPath = path.join(cwd, ".claude", "hooks", ".manifest.json")
+	// Remove build artifacts (.mjs files in .claude/hooks/)
+	const hooksDir = path.join(cwd, ".claude", "hooks")
+	const manifestPath = path.join(hooksDir, ".manifest.json")
 
-	for (const dir of [distDir, srcDir]) {
-		if (fs.existsSync(dir)) {
-			fs.rmSync(dir, { recursive: true })
-			console.log(`Removed ${path.relative(cwd, dir)}/`)
+	if (fs.existsSync(hooksDir)) {
+		for (const file of fs.readdirSync(hooksDir)) {
+			if (file.endsWith(".mjs")) {
+				fs.unlinkSync(path.join(hooksDir, file))
+				console.log(`Removed .claude/hooks/${file}`)
+			}
 		}
 	}
 

@@ -6,7 +6,7 @@ import { type Manifest, readManifest, writeManifest } from "../settings/manifest
 import { cleanSettings, mergeSettings } from "../settings/merger.js"
 import type { HookSettingsEntry, SettingsHooks } from "../types/settings.js"
 import { bundleEntryScript } from "./bundler.js"
-import { artifactName, generateEntryScript } from "./codegen.js"
+import { generateEntryCode } from "./codegen.js"
 import { discoverExtensions } from "./discover.js"
 import { ensureHxResolvable } from "./resolve-plugin.js"
 
@@ -72,8 +72,6 @@ export async function buildExtensions(
 ): Promise<BuildResult> {
 	const extensionsDir = path.join(projectRoot, ".claude", "extensions")
 	const hooksDir = path.join(projectRoot, ".claude", "hooks")
-	const distDir = path.join(hooksDir, "dist")
-	const srcDir = path.join(hooksDir, "src")
 	const runtime = runtimeOverride ?? detectRuntime()
 
 	// 1. Discover extensions
@@ -135,48 +133,41 @@ export async function buildExtensions(
 		)
 		const groups = groupCommandRegistrations(commandRegs)
 
-		const extDistDir = path.join(distDir, ext.name)
-		const extSrcDir = path.join(srcDir, ext.name)
-
-		for (const group of groups) {
-			// 4. Codegen → bundle
-			const entryPath = generateEntryScript({
-				extensionEntryPoint: ext.entryPoint,
-				event: group.event,
-				matcher: group.matcher,
-				outDir: extSrcDir,
-			})
-
-			const name = artifactName(group.event, group.matcher)
-			const outName = `${name}.mjs`
+		// 4. Bundle once per extension (all hooks share the same .mjs)
+		if (groups.length > 0) {
+			const entryCode = generateEntryCode(ext.entryPoint)
+			const outName = `${ext.name}.mjs`
 
 			try {
 				await bundleEntryScript({
-					entryPath,
-					outDir: extDistDir,
+					entryCode,
+					outDir: hooksDir,
 					outName,
 				})
 			} catch (err) {
 				errors.push({
 					extension: ext.name,
-					error: `Bundle failed for ${name}: ${err instanceof Error ? err.message : String(err)}`,
+					error: `Bundle failed: ${err instanceof Error ? err.message : String(err)}`,
 				})
 				continue
 			}
 
-			// Generate settings entry
-			const relDistPath = path.relative(projectRoot, path.join(extDistDir, outName))
-			const command = `${runtime} "$CLAUDE_PROJECT_DIR/${relDistPath}" # hx-managed:${ext.name}:${group.event}:${group.matcher ?? ""}`
+			// 5. Register each (event, matcher) pointing to the same .mjs with CLI args
+			const relPath = path.relative(projectRoot, path.join(hooksDir, outName))
+			for (const group of groups) {
+				const matcherArg = group.matcher !== undefined ? ` ${group.matcher}` : ""
+				const command = `${runtime} "$CLAUDE_PROJECT_DIR/${relPath}" ${group.event}${matcherArg} # hx-managed:${ext.name}:${group.event}:${group.matcher ?? ""}`
 
-			addSettingsEntry(allSettings, group.event, group.matcher, {
-				type: "command",
-				command,
-				timeout: group.timeout,
-			})
-			hookCount++
+				addSettingsEntry(allSettings, group.event, group.matcher, {
+					type: "command",
+					command,
+					timeout: group.timeout,
+				})
+				hookCount++
+			}
 		}
 
-		// 5. Declarative hooks → settings entries directly
+		// 6. Declarative hooks → settings entries directly
 		for (const reg of collected.registrations) {
 			if (reg.type === "command") continue
 
@@ -212,13 +203,13 @@ export async function buildExtensions(
 		}
 	}
 
-	// 6. Clean up temporary symlink
+	// 7. Clean up temporary symlink
 	cleanupSymlink()
 
-	// 7. Merge into settings.local.json (always — strips stale hx entries even when empty)
+	// 8. Merge into settings.local.json (always — strips stale hx entries even when empty)
 	await mergeSettings(projectRoot, allSettings)
 
-	// 8. Update manifest
+	// 9. Update manifest
 	const newManifest: Manifest = {
 		version: 1,
 		generatedAt: new Date().toISOString(),

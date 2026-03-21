@@ -42,6 +42,13 @@ export class HookOutput {
 	/** @internal */ _elicitationAction?: "accept" | "decline" | "cancel"
 	/** @internal */ _elicitationContent?: Record<string, unknown>
 	/** @internal */ _interrupt?: boolean
+	/** @internal */ _visible?: boolean
+
+	/** Show the context message to the user in the terminal (via /dev/tty). */
+	visible(): this {
+		this._visible = true
+		return this
+	}
 
 	/** Add additionalContext to the output. */
 	context(text: string): this {
