@@ -12,12 +12,12 @@
       "devDependencies": {
         "@anthropic-ai/claude-agent-sdk": "latest",
         "@types/bun": "latest",
-        "bunli": "^0.8.2",
-        "lefthook": "^2.1.4",
+        "bunli": "0.8.2",
+        "lefthook": "2.1.4",
         "oxfmt": "latest",
         "oxlint": "latest",
-        "release-it": "^19.2.4",
-        "typescript": "^5.7.0",
+        "release-it": "19.2.4",
+        "typescript": "5.9.3",
       },
       "peerDependencies": {
         "@anthropic-ai/claude-agent-sdk": ">=0.2.0",
