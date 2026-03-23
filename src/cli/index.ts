@@ -11,6 +11,7 @@ import activateCommand from "./commands/activate.js"
 import initCommand from "./commands/init.js"
 import listCommand from "./commands/list.js"
 import newCommand from "./commands/new.js"
+import presetCommand from "./commands/preset.js"
 import updateCommand from "./commands/update.js"
 
 const cli = await createCLI({
@@ -31,6 +32,7 @@ cli.command(initCommand)
 cli.command(newCommand)
 cli.command(listCommand)
 cli.command(activateCommand)
+cli.command(presetCommand)
 cli.command(updateCommand)
 cli.command(cleanCommand)
 
