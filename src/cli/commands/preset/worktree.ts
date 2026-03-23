@@ -158,8 +158,7 @@ async function generateAndWrite(
 	}
 
 	// Generate via claude
-	const result =
-		await Bun.$`claude -p --system-prompt ${systemPrompt} ${prompt}`.quiet().nothrow()
+	const result = await Bun.$`claude -p --system-prompt ${systemPrompt} ${prompt}`.quiet().nothrow()
 
 	if (result.exitCode !== 0) {
 		console.error("Failed to generate extension:", result.stderr.toString())
