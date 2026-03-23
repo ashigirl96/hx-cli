@@ -5,3 +5,4 @@ node_modules/
 dist/
 docs/memory/
 skills/hook-creator-workspace/
+.envrc

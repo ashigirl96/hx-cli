@@ -1,0 +1,130 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`preset worktree — resolvePrompts new creation (no flags, extension does not exist) system prompt 1`] = `
+{
+  "kind": "generate",
+  "prompt": 
+"Generate a WorktreeCreate extension for this repo.
+
+WorktreeCreate is responsible for CREATING a git worktree and returning its absolute path.
+Claude Code uses the returned path as the working directory for the isolated session.
+If no path is returned, worktree creation FAILS.
+WorktreeRemove is NOT needed — Claude Code handles default git worktree removal automatically.
+
+Rules:
+- Start with: import { defineExtension } from "@dawkinsuke/hooks";
+- Use cc.on("WorktreeCreate", async (input) => { ... })
+- input.cwd is the project root directory
+- input.name is the worktree name/slug
+- Use Bun.$\`... 1>&2\` for shell commands (stdout is reserved for the worktree path, so redirect command output to stderr)
+- WorktreeCreate MUST return the absolute path string of the created worktree
+- Create the worktree under \`\${input.cwd}/.worktrees/\${input.name}\`
+- Be idempotent: use existsSync from "node:fs" to check if the worktree directory already exists, and if so skip creation and return the path immediately
+- Create a new branch with the same name as input.name
+- After creating the worktree, symlink any gitignored secret/config files from input.cwd
+- Install dependencies if a lock file exists (detect package manager)
+- Run codegen/build steps if applicable
+- Only include setup steps relevant to THIS repo — omit anything that doesn't apply
+- Use short comments for non-obvious lines
+- No console.log — use console.error for diagnostics (stdout is reserved for the worktree path return value)
+- If the repo needs no post-creation setup, just create the worktree and return the path
+- Do NOT add a WorktreeRemove handler — Claude Code's default git worktree removal handles cleanup automatically. A custom handler is only needed for non-git VCS (SVN, Perforce, etc.)
+
+Example output for a Node.js project:
+
+import { defineExtension } from "@dawkinsuke/hooks";
+import { existsSync } from "node:fs";
+
+export default defineExtension((cc) => {
+	cc.on("WorktreeCreate", async (input) => {
+		const root = input.cwd;
+		const name = input.name;
+		const worktreeDir = \`\${root}/.worktrees/\${name}\`;
+
+		// Reuse existing worktree if it exists
+		if (existsSync(worktreeDir)) return worktreeDir;
+
+		// Create worktree with new branch
+		await Bun.$\`git worktree add -b \${name} \${worktreeDir}\` 1>&2;
+
+		// Symlink secrets from project root
+		await Bun.$\`ln -sf "\${root}/.env" "\${worktreeDir}/.env"\` 1>&2;
+		await Bun.$\`ln -sf "\${root}/.dev.vars" "\${worktreeDir}/.dev.vars"\` 1>&2;
+
+		// Install deps and run codegen
+		await Bun.$\`cd \${worktreeDir} && npm ci && npx prisma generate\` 1>&2;
+
+		return worktreeDir;
+	});
+});
+
+Example output for a Rust project:
+
+import { defineExtension } from "@dawkinsuke/hooks";
+import { existsSync } from "node:fs";
+
+export default defineExtension((cc) => {
+	cc.on("WorktreeCreate", async (input) => {
+		const root = input.cwd;
+		const name = input.name;
+		const worktreeDir = \`\${root}/.worktrees/\${name}\`;
+
+		if (existsSync(worktreeDir)) return worktreeDir;
+
+		await Bun.$\`git worktree add -b \${name} \${worktreeDir}\` 1>&2;
+		await Bun.$\`ln -sf "\${root}/.env" "\${worktreeDir}/.env"\` 1>&2;
+		await Bun.$\`cd \${worktreeDir} && cargo fetch\` 1>&2;
+
+		return worktreeDir;
+	});
+});
+
+IMPORTANT: Output ONLY the raw TypeScript code. The very first characters of
+your response must be: import { defineExtension } — no preamble, no markdown,
+no commentary."
+,
+  "systemPrompt": 
+"You generate TypeScript extension files for hx-cli (Claude Code hooks toolkit).
+Output ONLY the TypeScript code — no markdown fences, no prose, no explanation.
+The first line of your response must be: import { defineExtension } from "@dawkinsuke/hooks";
+Do not wrap the code in \`\`\` code blocks."
+,
+}
+`;
+
+exports[`preset worktree — resolvePrompts partial modification (--edit, extension exists) system prompt and user prompt 1`] = `
+{
+  "kind": "generate",
+  "prompt": 
+"Read .claude/extensions/worktree-setup/index.ts and modify it based on:
+add pnpm support
+
+Output the complete updated extension.
+Keep all existing logic intact unless the modification explicitly changes it."
+,
+  "systemPrompt": 
+"You modify TypeScript extension files for hx-cli (Claude Code hooks toolkit).
+You will receive a modification request for an existing extension file.
+Output ONLY the modified TypeScript code — no markdown fences, no prose, no explanation.
+The first line of your response must be: import { defineExtension } from "@dawkinsuke/hooks";
+Do not wrap the code in \`\`\` code blocks."
+,
+}
+`;
+
+exports[`preset worktree — resolvePrompts error cases --edit without existing extension returns error 1`] = `
+{
+  "kind": "error",
+  "message": "No existing extension found. Run 'hx preset worktree' first.",
+}
+`;
+
+exports[`preset worktree — resolvePrompts error cases no flags with existing extension returns error 1`] = `
+{
+  "kind": "error",
+  "message": 
+"Extension "worktree-setup" already exists at .claude/extensions/worktree-setup/
+Run 'hx preset worktree --replace' to regenerate, or '--edit <prompt>' to modify."
+,
+}
+`;
