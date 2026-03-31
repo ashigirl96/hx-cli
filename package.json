@@ -40,7 +40,7 @@
 	"devDependencies": {
 		"@anthropic-ai/claude-agent-sdk": "latest",
 		"@types/bun": "latest",
-		"bunli": "0.8.2",
+		"bunli": "0.9.0",
 		"lefthook": "2.1.4",
 		"oxfmt": "latest",
 		"oxlint": "latest",
