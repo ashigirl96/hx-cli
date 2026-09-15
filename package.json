@@ -33,7 +33,7 @@
 		"release": "GITHUB_TOKEN=$(gh auth token) release-it --increment=patch"
 	},
 	"dependencies": {
-		"@bunli/core": "^0.8.2",
+		"@bunli/core": "^0.9.0",
 		"@bunli/plugin-completions": "^0.3.4",
 		"zod": "^4.3.6"
 	},
